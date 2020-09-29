@@ -1,21 +1,28 @@
 package model.services;
 
-import java.util.ArrayList;
 import java.util.List;
 
+import model.dao.DaoFactory;
+import model.dao.GruposDao;
 import model.entities.Grupos;
 
 public class GruposService {
 	
+	private GruposDao dao = DaoFactory.createGruposDao();
 	
-	public List<Grupos> findAll(){
-		List<Grupos> list = new ArrayList<>();
-		
-		list.add(new Grupos(1,"Colaboradores"));
-		list.add(new Grupos(2, "Crianças"));
-		list.add(new Grupos(3, "Ministério"));
-		return list;
+	public List<Grupos> findAll() {
+		return dao.findAll();
 	}
-	
 
+	public void saveOrUpdate(Grupos obj) {
+		if (obj.getId() == null) {
+			dao.insert(obj);
+		} else {
+			dao.update(obj);
+		}
+	}
+
+	public void remove(Grupos obj) {
+		dao.deleteById(obj.getId());
+	}
 }
