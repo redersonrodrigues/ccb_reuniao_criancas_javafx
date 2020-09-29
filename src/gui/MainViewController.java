@@ -3,6 +3,7 @@ package gui;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
+import java.util.function.Consumer;
 
 import application.Main;
 import gui.util.Alerts;
@@ -47,7 +48,11 @@ public class MainViewController implements Initializable {
 	@FXML
 	public void onMenuItemGruposAction() {
 		// System.out.println("onMenuItemGruposAction");
-		loadView2("/gui/GruposList.fxml");
+		loadView("/gui/GruposList.fxml", (GruposListController controller) ->{
+			controller.setGruposService(new GruposService());
+			controller.updateTableView();
+			
+		});
 
 	}
 
@@ -55,7 +60,7 @@ public class MainViewController implements Initializable {
 	public void onMenuItemSobreAction() {
 		// System.out.println("onMenuItemSobreAction");
 		// chama evento de abrir tela
-		loadView("/gui/Sobre.fxml");
+		loadView("/gui/Sobre.fxml", x ->{});
 	}
 
 	@Override
@@ -65,7 +70,7 @@ public class MainViewController implements Initializable {
 	}
 
 	// função para abrir uma outra tela
-	private synchronized void loadView(String absoluteName) {
+	private synchronized <T> void loadView(String absoluteName, Consumer<T> initializingAction) {
 
 		try {
 			FXMLLoader loader = new FXMLLoader(getClass().getResource(absoluteName));
@@ -80,32 +85,10 @@ public class MainViewController implements Initializable {
 			mainVBox.getChildren().add(mainMenu); // re-adiciona o menu principal
 			mainVBox.getChildren().addAll(newVBox.getChildren()); // adiciona os filhos do VBox que desejo,no caso da
 																	// tela Sobre
-
-		} catch (IOException e) {
-
-			Alerts.showAlert("IO Exception", "Erro abrindo a view", e.getMessage(), AlertType.ERROR);
-		}
-
-	}
-
-	private synchronized void loadView2(String absoluteName) {
-
-		try {
-			FXMLLoader loader = new FXMLLoader(getClass().getResource(absoluteName));
-			VBox newVBox = loader.load();
-
-			Scene mainScene = Main.getMainScene();
-
-			VBox mainVBox = (VBox) ((ScrollPane) mainScene.getRoot()).getContent();
-
-			Node mainMenu = mainVBox.getChildren().get(0);
-			mainVBox.getChildren().clear(); // apaga todos os filhos da VBox da pagina Main
-			mainVBox.getChildren().add(mainMenu); // re-adiciona o menu principal
-			mainVBox.getChildren().addAll(newVBox.getChildren()); // adiciona os filhos do VBox que desejo,no caso da
-																	// tela Sobre
-			GruposListController controller = loader.getController();
-			controller.setGruposService(new GruposService());
-			controller.updateTableView();
+			
+			// passos para executar a função qeu passar como argumento na abertura da tela
+			T controller = loader.getController();
+			initializingAction.accept(controller);
 			
 			
 			
@@ -116,4 +99,5 @@ public class MainViewController implements Initializable {
 
 	}
 
+	
 }
