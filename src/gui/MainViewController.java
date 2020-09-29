@@ -15,6 +15,7 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.VBox;
+import model.services.GruposService;
 
 public class MainViewController implements Initializable {
 	@FXML
@@ -27,68 +28,92 @@ public class MainViewController implements Initializable {
 	private MenuItem menuItemGrupos;
 	@FXML
 	private MenuItem menuItemSobre;
-	
-	
+
 	@FXML
 	public void onMenuItemReunioesAction() {
 		System.out.println("onMenuItemReunioesAction");
 	}
-	
+
 	@FXML
 	public void onMenuItemColaboradoresAction() {
 		System.out.println("onMenuItemColaboradoresAction");
 	}
-	
+
 	@FXML
 	public void onMenuItemCriancasAction() {
 		System.out.println("onMenuItemCriancasAction");
 	}
-	
+
 	@FXML
 	public void onMenuItemGruposAction() {
-		//System.out.println("onMenuItemGruposAction");
-		loadView("/gui/GruposList.fxml");
-		
+		// System.out.println("onMenuItemGruposAction");
+		loadView2("/gui/GruposList.fxml");
+
 	}
-	
+
 	@FXML
 	public void onMenuItemSobreAction() {
-		//System.out.println("onMenuItemSobreAction");
-		//chama evento de abrir tela
+		// System.out.println("onMenuItemSobreAction");
+		// chama evento de abrir tela
 		loadView("/gui/Sobre.fxml");
 	}
-	
-		
-	
+
 	@Override
 	public void initialize(URL url, ResourceBundle rb) {
 		// TODO Auto-generated method stub
-		
+
 	}
-	
+
 	// função para abrir uma outra tela
 	private synchronized void loadView(String absoluteName) {
-		
+
 		try {
 			FXMLLoader loader = new FXMLLoader(getClass().getResource(absoluteName));
 			VBox newVBox = loader.load();
-			
+
 			Scene mainScene = Main.getMainScene();
-			
+
 			VBox mainVBox = (VBox) ((ScrollPane) mainScene.getRoot()).getContent();
-			
+
 			Node mainMenu = mainVBox.getChildren().get(0);
 			mainVBox.getChildren().clear(); // apaga todos os filhos da VBox da pagina Main
 			mainVBox.getChildren().add(mainMenu); // re-adiciona o menu principal
-			mainVBox.getChildren().addAll(newVBox.getChildren()); // adiciona os filhos do VBox que desejo,no caso da tela Sobre
-			
+			mainVBox.getChildren().addAll(newVBox.getChildren()); // adiciona os filhos do VBox que desejo,no caso da
+																	// tela Sobre
+
 		} catch (IOException e) {
-			
+
 			Alerts.showAlert("IO Exception", "Erro abrindo a view", e.getMessage(), AlertType.ERROR);
 		}
-		
+
 	}
-	
-	
+
+	private synchronized void loadView2(String absoluteName) {
+
+		try {
+			FXMLLoader loader = new FXMLLoader(getClass().getResource(absoluteName));
+			VBox newVBox = loader.load();
+
+			Scene mainScene = Main.getMainScene();
+
+			VBox mainVBox = (VBox) ((ScrollPane) mainScene.getRoot()).getContent();
+
+			Node mainMenu = mainVBox.getChildren().get(0);
+			mainVBox.getChildren().clear(); // apaga todos os filhos da VBox da pagina Main
+			mainVBox.getChildren().add(mainMenu); // re-adiciona o menu principal
+			mainVBox.getChildren().addAll(newVBox.getChildren()); // adiciona os filhos do VBox que desejo,no caso da
+																	// tela Sobre
+			GruposListController controller = loader.getController();
+			controller.setGruposService(new GruposService());
+			controller.updateTableView();
+			
+			
+			
+		} catch (IOException e) {
+
+			Alerts.showAlert("IO Exception", "Erro abrindo a view", e.getMessage(), AlertType.ERROR);
+		}
+
+	}
 
 }
