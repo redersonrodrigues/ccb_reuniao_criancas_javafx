@@ -24,6 +24,8 @@ public class MainViewController implements Initializable {
 	@FXML
 	private MenuItem menuItemCriancas;
 	@FXML
+	private MenuItem menuItemGrupos;
+	@FXML
 	private MenuItem menuItemSobre;
 	
 	
@@ -40,6 +42,13 @@ public class MainViewController implements Initializable {
 	@FXML
 	public void onMenuItemCriancasAction() {
 		System.out.println("onMenuItemCriancasAction");
+	}
+	
+	@FXML
+	public void onMenuItemGruposAction() {
+		//System.out.println("onMenuItemGruposAction");
+		loadView("/gui/GruposList.fxml");
+		
 	}
 	
 	@FXML

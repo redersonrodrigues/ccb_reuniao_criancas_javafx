@@ -17,6 +17,7 @@
                     <MenuItem fx:id="menuItemReunioes" mnemonicParsing="false" onAction="#onMenuItemReunioesAction" text="Reuniões" />
                         <MenuItem fx:id="menuItemCriancas" mnemonicParsing="false" onAction="#onMenuItemCriancasAction" text="Crianças" />
                         <MenuItem fx:id="menuItemColaboradores" mnemonicParsing="false" onAction="#onMenuItemColaboradoresAction" text="Colaboradores" />
+                        <MenuItem fx:id="menuItemGrupos" mnemonicParsing="false" onAction="#onMenuItemGruposAction" text="Grupos" />
                   </items>
                 </Menu>
                 <Menu mnemonicParsing="false" text="Ajuda">
