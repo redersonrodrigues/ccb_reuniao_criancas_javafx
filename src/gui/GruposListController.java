@@ -1,18 +1,27 @@
 package gui;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
 
 import application.Main;
+import gui.util.Alerts;
+import gui.util.Utils;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Scene;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.Pane;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import model.entities.Grupos;
 import model.services.GruposService;
@@ -41,8 +50,12 @@ public class GruposListController implements Initializable {
 	
 	
 	@FXML
-	public void onBtNovoAction() {
-		System.out.println("onBtNovoAction");
+	public void onBtNovoAction(ActionEvent event) {
+		//acessa o Stage da tela referência
+		Stage parentStage = Utils.currentStage(event);
+		//repasso o Stage adquirido com a classe criada para abstrai-lo como o segundo paramentro para abrir a tela.
+		createDialogForm("/gui/GruposForm.fxml", parentStage);
+		
 	}
 	
 	
@@ -83,7 +96,26 @@ public class GruposListController implements Initializable {
 		tableViewGrupos.setItems(obsList);
 	}
 	
-	
+	private void createDialogForm(String absoluteName, Stage parenteStage) {
+		try {
+			//carrega a view atraves da variavel absoluteName
+			FXMLLoader loader = new FXMLLoader(getClass().getResource(absoluteName));
+			Pane pane = loader.load();
+			// passos para abrir um formulario modal a partir de outro de referência
+			Stage dialogStage = new Stage();
+			dialogStage.setTitle("Entre com os dados do grupo: ");
+			dialogStage.setScene(new Scene(pane));
+			dialogStage.setResizable(false);
+			dialogStage.initOwner(parenteStage);
+			dialogStage.initModality(Modality.WINDOW_MODAL);
+			dialogStage.showAndWait();
+			
+			
+		} 
+		catch (IOException e) {
+				Alerts.showAlert("IO Exception", "Error loading view", e.getMessage(), AlertType.ERROR);
+		}
+	}
 	
 
 }
