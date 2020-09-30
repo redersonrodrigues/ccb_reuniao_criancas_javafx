@@ -15,9 +15,12 @@
                 <Menu mnemonicParsing="false" text="Registros">
                   <items>
                     <MenuItem fx:id="menuItemReunioes" mnemonicParsing="false" onAction="#onMenuItemReunioesAction" text="Reuniões" />
-                        <MenuItem fx:id="menuItemCriancas" mnemonicParsing="false" onAction="#onMenuItemCriancasAction" text="Crianças" />
-                        <MenuItem fx:id="menuItemColaboradores" mnemonicParsing="false" onAction="#onMenuItemColaboradoresAction" text="Colaboradores" />
+                        <MenuItem fx:id="menuItemPessoas" mnemonicParsing="false" onAction="#onMenuItemPessoasAction" text="Pessoas" />
                         <MenuItem fx:id="menuItemGrupos" mnemonicParsing="false" onAction="#onMenuItemGruposAction" text="Grupos" />
+                        <MenuItem fx:id="menuItemEstados" mnemonicParsing="false" onAction="#onMenuItemEstadosAction" text="Estados" />
+                        <MenuItem fx:id="menuItemCidades" mnemonicParsing="false" onAction="#onMenuItemCidadesAction" text="Cidades" />
+                        <MenuItem fx:id="menuItemTiposUsuarios" mnemonicParsing="false" onAction="#onMenuItemTiposUsuariosAction" text="Tipos de Usuários" />
+                        <MenuItem fx:id="menuItemEquipes" mnemonicParsing="false" onAction="#onMenuItemEquipesAction" text="Equipes" />
                   </items>
                 </Menu>
                 <Menu mnemonicParsing="false" text="Ajuda">

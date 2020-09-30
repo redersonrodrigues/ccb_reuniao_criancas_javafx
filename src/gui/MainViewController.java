@@ -16,17 +16,24 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.VBox;
+import model.services.EstadosService;
 import model.services.GruposService;
 
 public class MainViewController implements Initializable {
 	@FXML
 	private MenuItem menuItemReunioes;
 	@FXML
-	private MenuItem menuItemColaboradores;
-	@FXML
-	private MenuItem menuItemCriancas;
+	private MenuItem menuItemPessoas;
 	@FXML
 	private MenuItem menuItemGrupos;
+	@FXML
+	private MenuItem menuItemEstados;
+	@FXML
+	private MenuItem menuItemCidades;
+	@FXML
+	private MenuItem menuItemTiposUsuarios;
+	@FXML
+	private MenuItem menuItemEquipes;
 	@FXML
 	private MenuItem menuItemSobre;
 
@@ -36,13 +43,8 @@ public class MainViewController implements Initializable {
 	}
 
 	@FXML
-	public void onMenuItemColaboradoresAction() {
-		System.out.println("onMenuItemColaboradoresAction");
-	}
-
-	@FXML
-	public void onMenuItemCriancasAction() {
-		System.out.println("onMenuItemCriancasAction");
+	public void onMenuItemPessoasAction() {
+		System.out.println("onMenuItemPessoasAction");
 	}
 
 	@FXML
@@ -55,6 +57,34 @@ public class MainViewController implements Initializable {
 		});
 
 	}
+
+	@FXML
+	public void onMenuItemEstadosAction() {
+		//System.out.println("onMenuItemEstasdosAction");
+		loadView("/gui/EstadosList.fxml", (EstadosListController controller) ->{
+			controller.setEstadosService(new EstadosService());
+			controller.updateTableView();
+			
+		});
+		
+		
+	}
+	
+	@FXML
+	public void onMenuItemCidadesAction() {
+		System.out.println("onMenuItemCidadesAction");
+	}
+
+	@FXML
+	public void onMenuItemTiposUsuariosAction() {
+		System.out.println("onMenuItemTiposUsuariosAction");
+	}
+	
+	@FXML
+	public void onMenuItemEquipesAction() {
+		System.out.println("onMenuItemEquipesAction");
+	}
+
 
 	@FXML
 	public void onMenuItemSobreAction() {
