@@ -9,9 +9,14 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import model.entities.Grupos;
 
 public class GruposFormController implements Initializable{
+	
+	// injeção de dependencia para a entidade relacionada a este formulário
+	private Grupos entity;
 
+	
 	@FXML
 	private TextField txtId;
 	
@@ -26,6 +31,13 @@ public class GruposFormController implements Initializable{
 	
 	@FXML
 	private Button btCancelar;
+	
+	
+	public void setGrupos(Grupos entity) {
+		this.entity = entity;
+	}
+
+	
 	
 	@FXML
 	public void onBtSalvarAction() {
@@ -55,6 +67,15 @@ public class GruposFormController implements Initializable{
 		Constraints.setTextFieldMaxLength(txtNome, 30);
 	}
 	
-	
+	public void updateFormData() {
+		if (entity == null) {
+			throw new IllegalStateException("Entity was null");
+		}
+				
+		txtId.setText(String.valueOf(entity.getId()));
+		txtNome.setText(entity.getNome());
+		
+		
+	}
 
 }

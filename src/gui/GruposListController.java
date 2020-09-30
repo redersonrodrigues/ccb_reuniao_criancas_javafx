@@ -53,8 +53,9 @@ public class GruposListController implements Initializable {
 	public void onBtNovoAction(ActionEvent event) {
 		//acessa o Stage da tela referência
 		Stage parentStage = Utils.currentStage(event);
+		Grupos obj = new Grupos();
 		//repasso o Stage adquirido com a classe criada para abstrai-lo como o segundo paramentro para abrir a tela.
-		createDialogForm("/gui/GruposForm.fxml", parentStage);
+		createDialogForm(obj, "/gui/GruposForm.fxml", parentStage);
 		
 	}
 	
@@ -96,11 +97,18 @@ public class GruposListController implements Initializable {
 		tableViewGrupos.setItems(obsList);
 	}
 	
-	private void createDialogForm(String absoluteName, Stage parenteStage) {
+	private void createDialogForm(Grupos obj, String absoluteName, Stage parenteStage) {
 		try {
 			//carrega a view atraves da variavel absoluteName
 			FXMLLoader loader = new FXMLLoader(getClass().getResource(absoluteName));
 			Pane pane = loader.load();
+			
+			// passos para carregar dados
+			GruposFormController controller = loader.getController();
+			controller.setGrupos(obj);
+			controller.updateFormData();
+			
+			
 			// passos para abrir um formulario modal a partir de outro de referência
 			Stage dialogStage = new Stage();
 			dialogStage.setTitle("Entre com os dados do grupo: ");
