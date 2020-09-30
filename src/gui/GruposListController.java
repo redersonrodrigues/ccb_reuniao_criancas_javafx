@@ -9,6 +9,7 @@ import application.Main;
 import gui.listeners.DataChangeListener;
 import gui.util.Alerts;
 import gui.util.Utils;
+import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -18,6 +19,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
+import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -44,6 +46,9 @@ public class GruposListController implements Initializable, DataChangeListener {
 	private TableColumn<Grupos, String> tableColumnNome;
 	
 	@FXML
+	private TableColumn<Grupos, Grupos> tableColumnEDIT;
+	
+	@FXML
 	private Button btNovo;
 	
 	
@@ -65,7 +70,28 @@ public class GruposListController implements Initializable, DataChangeListener {
 		this.service = service;
 	}
 
-
+	private void initEditButtons() {
+		tableColumnEDIT.setCellValueFactory(param -> new ReadOnlyObjectWrapper<>(param.getValue()));
+		tableColumnEDIT.setCellFactory(param -> new TableCell<Grupos, Grupos>(){
+			private final Button button = new Button("edit");
+			
+			@Override
+			protected void updateItem(Grupos obj, boolean empty) {
+				super.updateItem(obj, empty);
+				
+				if (obj == null) {
+					setGraphic(null);
+					return;
+				}
+				
+				setGraphic(button);
+				button.setOnAction(
+						event -> createDialogForm(obj, "/gui/GruposForm.fxml", Utils.currentStage(event)
+						));
+			}
+			
+		});
+	}
 	
 	
 	@Override
@@ -96,6 +122,7 @@ public class GruposListController implements Initializable, DataChangeListener {
 		List<Grupos> list = service.findAll();
 		obsList = FXCollections.observableArrayList(list);
 		tableViewGrupos.setItems(obsList);
+		initEditButtons(); // acrescentará um novo botão com o texto edit em cada linha da tabela
 	}
 	
 	private void createDialogForm(Grupos obj, String absoluteName, Stage parenteStage) {
@@ -135,6 +162,9 @@ public class GruposListController implements Initializable, DataChangeListener {
 		updateTableView();
 		
 	}
+	
+	
+	
 	
 
 }
