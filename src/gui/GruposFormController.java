@@ -1,19 +1,22 @@
 package gui;
 
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.ResourceBundle;
 
 import db.DbException;
+import gui.listeners.DataChangeListener;
 import gui.util.Alerts;
 import gui.util.Constraints;
 import gui.util.Utils;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import javafx.scene.control.Alert.AlertType;
 import model.entities.Grupos;
 import model.services.GruposService;
 
@@ -24,6 +27,10 @@ public class GruposFormController implements Initializable{
 	
 	// injeção dependência GruposService
 	private GruposService service;
+	
+	private List<DataChangeListener> dataChangeListeners = new ArrayList<>();
+	
+	
 
 	
 	@FXML
@@ -54,6 +61,14 @@ public class GruposFormController implements Initializable{
 
 
 
+	//metodo para se inscrever na lista
+	public void subscribeDataChangeListener(DataChangeListener listener) {
+		dataChangeListeners.add(listener);
+	}
+	
+	
+	
+	
 	@FXML
 	public void onBtSalvarAction(ActionEvent event) {
 		if (entity == null ) {
@@ -67,6 +82,7 @@ public class GruposFormController implements Initializable{
 		//System.out.println("onBtSalvarAction");
 		entity = getFormData();
 		service.saveOrUpdate(entity);
+		notifyDataChangeListeners();
 		Utils.currentStage(event).close();
 		}
 		catch (DbException e) {
@@ -75,7 +91,16 @@ public class GruposFormController implements Initializable{
 		
 	}
 	
-	
+	// mandar envento para todos os listeners
+	private void notifyDataChangeListeners() {
+		for (DataChangeListener listener : dataChangeListeners) {
+			listener.onDataChanged();
+		}
+		
+	}
+
+
+
 	// metodo para capturar o que esta nos campos do formulario e instanciar um grupo
 	private Grupos getFormData() {
 		

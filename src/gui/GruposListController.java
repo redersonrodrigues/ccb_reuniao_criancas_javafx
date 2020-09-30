@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.ResourceBundle;
 
 import application.Main;
+import gui.listeners.DataChangeListener;
 import gui.util.Alerts;
 import gui.util.Utils;
 import javafx.collections.FXCollections;
@@ -26,7 +27,7 @@ import javafx.stage.Stage;
 import model.entities.Grupos;
 import model.services.GruposService;
 
-public class GruposListController implements Initializable {
+public class GruposListController implements Initializable, DataChangeListener {
 	
 	//declarando dependencia lista de grupos mock
 	private GruposService service;
@@ -107,6 +108,7 @@ public class GruposListController implements Initializable {
 			GruposFormController controller = loader.getController();
 			controller.setGrupos(obj);
 			controller.setGruposService(new GruposService());//injeção de dependencia GruposServices para carregamento
+			controller.subscribeDataChangeListener(this);// se inscrevendo para observar listeners (onDataChanged)
 			controller.updateFormData();
 			
 			
@@ -124,6 +126,14 @@ public class GruposListController implements Initializable {
 		catch (IOException e) {
 				Alerts.showAlert("IO Exception", "Error loading view", e.getMessage(), AlertType.ERROR);
 		}
+	}
+
+
+	@Override
+	public void onDataChanged() {
+
+		updateTableView();
+		
 	}
 	
 
