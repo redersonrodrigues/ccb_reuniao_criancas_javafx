@@ -106,6 +106,7 @@ public class GruposListController implements Initializable {
 			// passos para carregar dados
 			GruposFormController controller = loader.getController();
 			controller.setGrupos(obj);
+			controller.setGruposService(new GruposService());//injeção de dependencia GruposServices para carregamento
 			controller.updateFormData();
 			
 			
