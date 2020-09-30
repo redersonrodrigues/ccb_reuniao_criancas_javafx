@@ -9,7 +9,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<VBox prefHeight="592.0" prefWidth="688.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.GruposListController">
+<VBox prefHeight="465.0" prefWidth="688.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.GruposListController">
    <children>
       <Label text="Cadastro de Grupos">
          <font>
@@ -27,8 +27,9 @@
       <TableView fx:id="tableViewGrupos" prefHeight="200.0" prefWidth="200.0">
         <columns>
           <TableColumn fx:id="tableColumnId" prefWidth="75.0" text="Id" />
-          <TableColumn fx:id="tableColumnNome" prefWidth="75.0" text="Nome" />
-            <TableColumn fx:id="tableColumnEDIT" prefWidth="75.0" />
+          <TableColumn fx:id="tableColumnNome" prefWidth="166.0" text="Nome" />
+            <TableColumn fx:id="tableColumnEDIT" minWidth="0.0" prefWidth="61.0" />
+            <TableColumn fx:id="tableColumnREMOVE" prefWidth="64.0" />
         </columns>
       </TableView>
    </children>

@@ -3,9 +3,12 @@ package gui;
 import java.io.IOException;
 import java.net.URL;
 import java.util.List;
+import java.util.Optional;
 import java.util.ResourceBundle;
 
 import application.Main;
+import db.DbException;
+import db.DbIntegrityException;
 import gui.listeners.DataChangeListener;
 import gui.util.Alerts;
 import gui.util.Utils;
@@ -19,6 +22,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -47,6 +51,9 @@ public class GruposListController implements Initializable, DataChangeListener {
 	
 	@FXML
 	private TableColumn<Grupos, Grupos> tableColumnEDIT;
+	
+	@FXML
+	private TableColumn<Grupos, Grupos> tableColumnREMOVE;
 	
 	@FXML
 	private Button btNovo;
@@ -101,6 +108,45 @@ public class GruposListController implements Initializable, DataChangeListener {
 		
 	}
 
+	private void initRemoveButtons() {
+		tableColumnREMOVE.setCellValueFactory(param -> new ReadOnlyObjectWrapper<>(param.getValue()));
+		tableColumnREMOVE.setCellFactory(param -> new TableCell<Grupos, Grupos>(){
+			private final Button button = new Button("deletar");
+			
+			@Override
+			protected void updateItem(Grupos obj, boolean empty) {
+				super.updateItem(obj, empty);
+				
+				if (obj == null) {
+					setGraphic(null);
+					return;
+				}
+				
+				setGraphic(button);
+				button.setOnAction(
+						event -> removeEntity(obj)
+						);
+			}
+			
+		});
+	}
+
+	private void removeEntity(Grupos obj) {
+		
+	Optional<ButtonType> result =	Alerts.showConfirmation("Confirmação!",	"Realmente deseja deletar(apagar definitivamente)?");
+	if (result.get() == ButtonType.OK) {
+		if (service == null) {
+			throw new IllegalStateException("Service was null!");
+		}
+		try {
+		service.remove(obj);
+		updateTableView();
+		}
+		catch (DbIntegrityException e) {
+			Alerts.showAlert("Error removing object", null, e.getMessage(), AlertType.ERROR);
+		}
+	}	
+	}
 
 
 	private void InitializeNodes() {
@@ -123,6 +169,7 @@ public class GruposListController implements Initializable, DataChangeListener {
 		obsList = FXCollections.observableArrayList(list);
 		tableViewGrupos.setItems(obsList);
 		initEditButtons(); // acrescentará um novo botão com o texto edit em cada linha da tabela
+		initRemoveButtons();// acrescentando um novo botao em cada linha, como o edit, para remoção de itens
 	}
 	
 	private void createDialogForm(Grupos obj, String absoluteName, Stage parenteStage) {
