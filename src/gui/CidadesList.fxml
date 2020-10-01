@@ -6,6 +6,7 @@
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.ToolBar?>
+<?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
@@ -27,11 +28,11 @@
       <TableView fx:id="tableViewCidades" prefHeight="247.0" prefWidth="688.0">
         <columns>
           <TableColumn fx:id="tableColumnId" prefWidth="75.0" text="Id" />
-          <TableColumn fx:id="tableColumnNome" prefWidth="228.0" text="Nome" />
-            <TableColumn fx:id="tableColumnSigla" prefWidth="105.0" text="Sigla" />
-            <TableColumn fx:id="tableColumnEDIT" minWidth="0.0" prefWidth="56.0" />
-            <TableColumn fx:id="tableColumnREMOVE" prefWidth="54.0" />
+          <TableColumn fx:id="tableColumnNome" prefWidth="359.0" text="Nome" />
+            <TableColumn fx:id="tableColumnEDIT" minWidth="0.0" prefWidth="68.0" />
+            <TableColumn fx:id="tableColumnREMOVE" prefWidth="84.0" />
         </columns>
       </TableView>
+      <BorderPane prefHeight="200.0" prefWidth="200.0" />
    </children>
 </VBox>

@@ -31,9 +31,9 @@ public class CidadesDaoJDBC implements CidadesDao {
 		ResultSet rs = null;
 		try {
 			st = conn.prepareStatement(
-					"SELECT cidades.*, estados.est_nome as EstNome " 
+			"SELECT cidades.*, estados.est_sigla as EstSigla " 
 			+ " FROM cidades INNER JOIN estados "
-			+ " ON estados.id_estados =  estados.est_id " 
+			+ " ON cidades.id_estados =  estados.est_id " 
 			+ " WHERE cidades.cid_id = ?");
 
 			st.setInt(1, id);
@@ -62,8 +62,8 @@ public class CidadesDaoJDBC implements CidadesDao {
 
 	private Estados instantiateEstados(ResultSet rs) throws SQLException {
 		Estados est = new Estados();
-		est.setEst_id(rs.getInt("est_id"));
-		est.setEst_nome(rs.getString("est_nome"));
+		est.setEst_id(rs.getInt("id_estados"));
+		est.setEst_nome(rs.getString("EstSigla"));
 		return est;
 	}
 
@@ -73,9 +73,9 @@ public class CidadesDaoJDBC implements CidadesDao {
 		ResultSet rs = null;
 		try {
 			st = conn.prepareStatement(
-					"SELECT cidades.*, estados.est_nome as EstNome " 
+					"SELECT cidades.*, estados.est_sigla as EstSigla " 
 			+ " FROM cidades INNER JOIN estados "
-			+ " ON estados.id_estados =  estados.est_id " 
+			+ " ON cidades.id_estados =  estados.est_id " 
 			+ " ORDER BY cid_nome ");
 
 
@@ -86,11 +86,11 @@ public class CidadesDaoJDBC implements CidadesDao {
 
 			while (rs.next()) {
 			
-				Estados est = map.get(rs.getInt("est_id"));
+				Estados est = map.get(rs.getInt("id_estados"));
 
 				if (est == null) {
 					est = instantiateEstados(rs);
-					map.put(rs.getInt("est_id"), est);
+					map.put(rs.getInt("id_estados"), est);
 				}
 
 				Cidades obj = instantiateCidades(rs, est);
@@ -113,9 +113,9 @@ public class CidadesDaoJDBC implements CidadesDao {
 		ResultSet rs = null;
 		try {
 			st = conn.prepareStatement(
-							"SELECT cidades.*,estados.est_nome as EstNome " 
+							"SELECT cidades.*,estados.est_sigla as EstSigla " 
 							+ "FROM cidades INNER JOIN estados "
-							+ "ON cidades.id_estadoss = estados.est_id " 
+							+ "ON cidades.id_estados = estados.est_id " 
 							+ "WHERE estados.est_id = ? " 
 							+ "ORDER BY cid_nome");
 

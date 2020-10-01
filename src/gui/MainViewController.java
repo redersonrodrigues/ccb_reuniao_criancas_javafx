@@ -61,7 +61,6 @@ public class MainViewController implements Initializable {
 
 	@FXML
 	public void onMenuItemEstadosAction() {
-		//System.out.println("onMenuItemEstasdosAction");
 		loadView("/gui/EstadosList.fxml", (EstadosListController controller) ->{
 			controller.setEstadosService(new EstadosService());
 			controller.updateTableView();
@@ -73,7 +72,6 @@ public class MainViewController implements Initializable {
 	
 	@FXML
 	public void onMenuItemCidadesAction() {
-		//System.out.println("onMenuItemCidadesAction");
 		loadView("/gui/CidadesList.fxml", (CidadesListController controller) ->{
 			controller.setCidadesService(new CidadesService());
 			controller.updateTableView();
