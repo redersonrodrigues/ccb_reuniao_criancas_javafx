@@ -19,17 +19,17 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import model.entities.Estados;
+import model.entities.Cidades;
 import model.exceptions.ValidationException;
-import model.services.EstadosService;
+import model.services.CidadesService;
 
-public class EstadosFormController implements Initializable{
+public class CidadesFormController implements Initializable{
 	
 	// injeção de dependencia para a entidade relacionada a este formulário
-	private Estados entity;
+	private Cidades entity;
 	
-	// injeção dependência EstadosService
-	private EstadosService service;
+	// injeção dependência CidadesService
+	private CidadesService service;
 	
 	private List<DataChangeListener> dataChangeListeners = new ArrayList<>();
 	
@@ -58,13 +58,13 @@ public class EstadosFormController implements Initializable{
 	private Button btCancelar;
 	
 	
-	public void setEstados(Estados entity) {
+	public void setCidades(Cidades entity) {
 		this.entity = entity;
 	}
 
 	
 	
-	public void setEstadosService(EstadosService service) {
+	public void setCidadesService(CidadesService service) {
 		this.service = service;
 	}
 
@@ -114,13 +114,13 @@ public class EstadosFormController implements Initializable{
 
 
 	// metodo para capturar o que esta nos campos do formulario e instanciar um grupo
-	private Estados getFormData() {
+	private Cidades getFormData() {
 		
-		Estados obj = new Estados();
+		Cidades obj = new Cidades();
 		
 		ValidationException exception = new ValidationException("Validation error");
 
-		obj.setEst_id(Utils.tryParseToInt(txtId.getText()));
+		obj.setCid_id(Utils.tryParseToInt(txtId.getText()));
 		
 		if (txtNome.getText() == null || txtNome.getText().trim().equals("")) {
 		
@@ -128,8 +128,7 @@ public class EstadosFormController implements Initializable{
 		
 		}
 		
-		obj.setEst_nome(txtNome.getText());
-		obj.setEst_sigla(txtSigla.getText());
+		obj.setCid_nome(txtNome.getText());
 		
 		if (exception.getErrors().size() > 0) {
 			throw exception;
@@ -169,9 +168,8 @@ public class EstadosFormController implements Initializable{
 			throw new IllegalStateException("Entity was null");
 		}
 				
-		txtId.setText(String.valueOf(entity.getEst_id()));
-		txtNome.setText(entity.getEst_nome());
-		txtSigla.setText(entity.getEst_sigla());
+		txtId.setText(String.valueOf(entity.getCid_id()));
+		txtNome.setText(entity.getCid_nome());
 		
 		
 	}
