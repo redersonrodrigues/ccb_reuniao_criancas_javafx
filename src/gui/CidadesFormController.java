@@ -147,6 +147,9 @@ public class CidadesFormController implements Initializable{
 		
 		obj.setCid_nome(txtNome.getText());
 		
+		obj.setEstados(comboBoxEstados.getValue());
+		
+		
 		if (exception.getErrors().size() > 0) {
 			throw exception;
 		}
@@ -215,10 +218,7 @@ public class CidadesFormController implements Initializable{
 		Set<String> fields = errors.keySet();
 		
 		if (fields.contains("nome")) {
-			
-			labelErrorNome.setText(errors.get("nome"));
-			
-			
+			labelErrorNome.setText(errors.get("nome"));	
 		}
 		
 	}

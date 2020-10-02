@@ -31,6 +31,7 @@
             <Label text="Nome" GridPane.rowIndex="1" />
             <TextField fx:id="txtId" editable="false" prefHeight="29.0" prefWidth="257.0" GridPane.columnIndex="1" />
             <TextField fx:id="txtNome" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+            <ComboBox fx:id="comboBoxEstados" prefHeight="25.0" prefWidth="259.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
             <Label fx:id="labelErrorNome" textFill="RED" GridPane.columnIndex="2" GridPane.rowIndex="1" />
             <HBox prefHeight="28.0" prefWidth="381.0" spacing="5.0" GridPane.columnIndex="1" GridPane.rowIndex="3">
                <children>
@@ -42,9 +43,7 @@
                </padding>
             </HBox>
             <Label text="Estado" GridPane.rowIndex="2" />
-            <Label fx:id="labelErrorSigla" textFill="RED" GridPane.columnIndex="2" GridPane.rowIndex="2" />
             <BorderPane prefHeight="200.0" prefWidth="200.0" />
-            <ComboBox fx:id="comboBoxEstados" prefHeight="25.0" prefWidth="259.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
          </children>
       </GridPane>
    </children>
