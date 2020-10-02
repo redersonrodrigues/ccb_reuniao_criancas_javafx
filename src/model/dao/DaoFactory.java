@@ -2,6 +2,7 @@ package model.dao;
 
 import db.DB;
 import model.dao.impl.CidadesDaoJDBC;
+import model.dao.impl.EquipesDaoJDBC;
 import model.dao.impl.EstadosDaoJDBC;
 import model.dao.impl.GruposDaoJDBC;
 import model.dao.impl.TiposUsuariosDaoJDBC;
@@ -25,6 +26,9 @@ public class DaoFactory {
 	public static TiposUsuariosDao createTiposUsuariosDao() {
 		return new TiposUsuariosDaoJDBC(DB.getConnection());
 	}
-	
+
+	public static EquipesDao createEquipesDao() {
+		return new EquipesDaoJDBC(DB.getConnection());
+	}
 	
 }

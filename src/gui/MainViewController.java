@@ -17,6 +17,7 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.VBox;
 import model.services.CidadesService;
+import model.services.EquipesService;
 import model.services.EstadosService;
 import model.services.GruposService;
 import model.services.TiposUsuariosService;
@@ -93,7 +94,11 @@ public class MainViewController implements Initializable {
 	
 	@FXML
 	public void onMenuItemEquipesAction() {
-		System.out.println("onMenuItemEquipesAction");
+		loadView("/gui/EquipesList.fxml", (EquipesListController controller) -> {
+			controller.setEquipesService(new EquipesService());
+			controller.updateTableView();
+			
+		});
 	}
 
 
