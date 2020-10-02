@@ -19,6 +19,7 @@ import javafx.scene.layout.VBox;
 import model.services.CidadesService;
 import model.services.EstadosService;
 import model.services.GruposService;
+import model.services.TiposUsuariosService;
 
 public class MainViewController implements Initializable {
 	@FXML
@@ -82,7 +83,12 @@ public class MainViewController implements Initializable {
 
 	@FXML
 	public void onMenuItemTiposUsuariosAction() {
-		System.out.println("onMenuItemTiposUsuariosAction");
+		loadView("/gui/TiposUsuariosList.fxml", (TiposUsuariosListController controller) -> {
+			controller.setTiposUsuariosService(new TiposUsuariosService());
+			controller.updateTableView();
+			
+		});
+	
 	}
 	
 	@FXML
