@@ -1,5 +1,6 @@
 package gui;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.List;
 import java.util.Optional;
@@ -15,7 +16,9 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Scene;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
@@ -23,9 +26,12 @@ import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.Pane;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import model.entities.Cidades;
 import model.services.CidadesService;
+import model.services.EstadosService;
 
 public class CidadesListController implements Initializable, DataChangeListener {
 	
@@ -168,7 +174,7 @@ public class CidadesListController implements Initializable, DataChangeListener 
 	}
 	
 	private void createDialogForm(Cidades obj, String absoluteName, Stage parenteStage) {
-		/*try {
+		try {
 			//carrega a view atraves da variavel absoluteName
 			FXMLLoader loader = new FXMLLoader(getClass().getResource(absoluteName));
 			Pane pane = loader.load();
@@ -176,8 +182,11 @@ public class CidadesListController implements Initializable, DataChangeListener 
 			// passos para carregar dados
 			CidadesFormController controller = loader.getController();
 			controller.setCidades(obj);
-			controller.setCidadesService(new CidadesService());//injeção de dependencia CidadesServices para carregamento
-			controller.subscribeDataChangeListener(this);// se inscrevendo para observar listeners (onDataChanged)
+			controller.setCidadesServices(new CidadesService(), new EstadosService());//injeção de dependencia CidadesServices para carregamento
+			
+			controller.loadAssociatedObjects(); // carrega estados do banco de dados e deixa no controller
+			
+ 			controller.subscribeDataChangeListener(this);// se inscrevendo para observar listeners (onDataChanged)
 			controller.updateFormData();
 			
 			
@@ -193,8 +202,9 @@ public class CidadesListController implements Initializable, DataChangeListener 
 			
 		} 
 		catch (IOException e) {
-				Alerts.showAlert("IO Exception", "Error loading view", e.getMessage(), AlertType.ERROR);
-		}*/
+			e.printStackTrace();
+			Alerts.showAlert("IO Exception", "Error loading view", e.getMessage(), AlertType.ERROR);
+		}
 	}
 
 

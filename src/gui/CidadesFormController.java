@@ -12,16 +12,24 @@ import gui.listeners.DataChangeListener;
 import gui.util.Alerts;
 import gui.util.Constraints;
 import gui.util.Utils;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListCell;
+import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
+import javafx.util.Callback;
 import model.entities.Cidades;
+import model.entities.Estados;
 import model.exceptions.ValidationException;
 import model.services.CidadesService;
+import model.services.EstadosService;
 
 public class CidadesFormController implements Initializable{
 	
@@ -30,6 +38,9 @@ public class CidadesFormController implements Initializable{
 	
 	// injeção dependência CidadesService
 	private CidadesService service;
+	
+	// injeção de dependencia EstadosService
+	private EstadosService estadosService;
 	
 	private List<DataChangeListener> dataChangeListeners = new ArrayList<>();
 	
@@ -43,7 +54,7 @@ public class CidadesFormController implements Initializable{
 	private TextField txtNome;
 	
 	@FXML
-	private TextField txtSigla;
+	private ComboBox<Estados> comboBoxEstados;
 	
 	@FXML
 	private Label labelErrorNome;
@@ -58,14 +69,20 @@ public class CidadesFormController implements Initializable{
 	private Button btCancelar;
 	
 	
+	private ObservableList<Estados> obsList;
+	
+	
+	
+	
 	public void setCidades(Cidades entity) {
 		this.entity = entity;
 	}
 
 	
 	
-	public void setCidadesService(CidadesService service) {
+	public void setCidadesServices(CidadesService service, EstadosService estadoService) {
 		this.service = service;
+		this.estadosService = estadoService;
 	}
 
 
@@ -160,7 +177,8 @@ public class CidadesFormController implements Initializable{
 	public void initializeNodes() {
 		Constraints.setTextFieldInteger(txtId);
 		Constraints.setTextFieldMaxLength(txtNome, 30);
-		Constraints.setTextFieldMaxLength(txtSigla, 2);
+		
+		initializeComboBoxEstados();
 	}
 	
 	public void updateFormData() {
@@ -171,8 +189,26 @@ public class CidadesFormController implements Initializable{
 		txtId.setText(String.valueOf(entity.getCid_id()));
 		txtNome.setText(entity.getCid_nome());
 		
+		if ( entity.getEstados() == null) {
+			comboBoxEstados.getSelectionModel().selectFirst();
+		}
+		else {
+		comboBoxEstados.setValue(entity.getEstados());
+		}
+		
 		
 	}
+	
+	public void loadAssociatedObjects() {
+		if (estadosService == null) {
+			throw new IllegalStateException("EstadosService was null");
+		}
+		
+		List<Estados> list = estadosService.findAll();
+		obsList = FXCollections.observableArrayList(list);
+		comboBoxEstados.setItems(obsList);
+	}
+	
 	
 	private void setErrorMessages(Map<String, String> errors) {
 		
@@ -185,6 +221,20 @@ public class CidadesFormController implements Initializable{
 			
 		}
 		
+	}
+	
+	private void initializeComboBoxEstados() {
+		Callback<ListView<Estados>, ListCell<Estados>> factory = lv ->  new ListCell<Estados>() {
+			@Override
+			protected void updateItem(Estados item, boolean empty) {
+				super.updateItem(item, empty);
+				setText(empty ? "" : item.getEst_nome());
+			}
+			
+		};
+		
+		comboBoxEstados.setCellFactory(factory);
+		comboBoxEstados.setButtonCell(factory.call(null));
 	}
 	
 
