@@ -15,7 +15,6 @@ import db.DB;
 import db.DbException;
 import db.DbIntegrityException;
 import model.dao.ReunioesCriancasDao;
-import model.entities.Estados;
 import model.entities.Pessoas;
 import model.entities.ReunioesCriancas;
 
@@ -28,150 +27,29 @@ public class ReunioesCriancasDaoJDBC implements ReunioesCriancasDao {
 	}
 
 	@Override
-	public ReunioesCriancas findById(Integer id) {
-		PreparedStatement st = null;
-		ResultSet rs = null;
-		try {
-			st = conn.prepareStatement(
-			"SELECT cidades.*, estados.est_sigla as EstSigla " 
-			+ " FROM cidades INNER JOIN estados "
-			+ " ON cidades.id_estados =  estados.est_id " 
-			+ " WHERE cidades.cid_id = ?");
-
-			st.setInt(1, id);
-			rs = st.executeQuery();
-			if (rs.next()) {
-				Estados est = instantiateEstados(rs);
-				ReunioesCriancas obj = instantiateReunioesCriancas(rs, est);
-				return obj;
-			}
-			return null;
-		} catch (SQLException e) {
-			throw new DbException(e.getMessage());
-		} finally {
-			DB.closeStatement(st);
-			DB.closeResultSet(rs);
-		}
-	}
-
-	private ReunioesCriancas instantiateReunioesCriancas(ResultSet rs, Estados est) throws SQLException {
-		ReunioesCriancas obj = new ReunioesCriancas();
-		obj.setCid_id(rs.getInt("cid_id"));
-		obj.setCid_nome(rs.getString("cid_nome"));
-		obj.setEstados(est);
-		return obj;
-	}
-
-	private Estados instantiateEstados(ResultSet rs) throws SQLException {
-		Estados est = new Estados();
-		est.setEst_id(rs.getInt("id_estados"));
-		est.setEst_nome(rs.getString("EstSigla"));
-		return est;
-	}
-
-	@Override
-	public List<ReunioesCriancas> findAll() {
-		PreparedStatement st = null;
-		ResultSet rs = null;
-		try {
-			st = conn.prepareStatement(
-					"SELECT cidades.*, estados.est_sigla as EstSigla " 
-			+ " FROM cidades INNER JOIN estados "
-			+ " ON cidades.id_estados =  estados.est_id " 
-			+ " ORDER BY cid_nome ");
-
-
-			rs = st.executeQuery();
-
-			List<ReunioesCriancas> list = new ArrayList<>();
-			Map<Integer, Estados> map = new HashMap<>();
-
-			while (rs.next()) {
-			
-				Estados est = map.get(rs.getInt("id_estados"));
-
-				if (est == null) {
-					est = instantiateEstados(rs);
-					map.put(rs.getInt("id_estados"), est);
-				}
-
-				ReunioesCriancas obj = instantiateReunioesCriancas(rs, est);
-				list.add(obj);
-			}
-			return list;
-		} catch (SQLException e) {
-			throw new DbException(e.getMessage());
-		} finally {
-			DB.closeStatement(st);
-			DB.closeResultSet(rs);
-		}
-	}
-	
-
-
-	@Override
-	public List<ReunioesCriancas> findByEstados(Estados estado) {
-		PreparedStatement st = null;
-		ResultSet rs = null;
-		try {
-			st = conn.prepareStatement(
-							"SELECT cidades.*,estados.est_sigla as EstSigla " 
-							+ "FROM cidades INNER JOIN estados "
-							+ "ON cidades.id_estados = estados.est_id " 
-							+ "WHERE estados.est_id = ? " 
-							+ "ORDER BY cid_nome");
-
-			st.setInt(1, estado.getEst_id());
-
-			rs = st.executeQuery();
-
-			List<ReunioesCriancas> list = new ArrayList<>();
-			Map<Integer, Estados> map = new HashMap<>();
-
-			while (rs.next()) {
-
-				Estados est = map.get(rs.getInt("est_id"));
-
-				if (est == null) {
-					est = instantiateEstados(rs);
-					map.put(rs.getInt("est_id"), est);
-				}
-
-				ReunioesCriancas obj = instantiateReunioesCriancas(rs, est);
-				list.add(obj);
-			}
-			return list;
-		} catch (SQLException e) {
-			throw new DbException(e.getMessage());
-		} finally {
-			DB.closeStatement(st);
-			DB.closeResultSet(rs);
-		}
-	
-	}
-	
-	
-	
-	
-	
-
-	@Override
 	public void insert(ReunioesCriancas obj) {
 		PreparedStatement st = null;
 		try {
-			st = conn.prepareStatement("INSERT INTO cidades " + "(cid_nome, id_estados)" + "VALUES " + "(?, ?)",
+			st = conn.prepareStatement(
+					"INSERT INTO reunioes "
+					+ "(reu_data, reu_atendimento, reu_tema, reu_equipe_responsavel, reu_observacoes, id_pessoa) "
+					+ "VALUES (?, ?, ?, ?, ?, ?)",
 					Statement.RETURN_GENERATED_KEYS);
 
-			st.setString(1, obj.getCid_nome());
-			st.setInt(2, obj.getEstados().getEst_id());
+			st.setDate(1, (java.sql.Date) obj.getReu_data());
+			st.setString(2, obj.getReu_atendimento());
+			st.setString(3, obj.getReu_tema());
+			st.setString(4, obj.getReu_equipe_respons());
+			st.setString(5, obj.getReu_observacoes());
+			st.setInt(6, obj.getPessoas().getPes_id());
 
 			int rowsAffected = st.executeUpdate();
 
 			if (rowsAffected > 0) {
 				ResultSet rs = st.getGeneratedKeys();
 				if (rs.next()) {
-					int cid_id = rs.getInt(1);
-					obj.setCid_id(cid_id);
+					int reu_id = rs.getInt(1);
+					obj.setReu_id(reu_id);
 				}
 			} else {
 				throw new DbException("Unexpected error! No rows affected!");
@@ -187,11 +65,16 @@ public class ReunioesCriancasDaoJDBC implements ReunioesCriancasDao {
 	public void update(ReunioesCriancas obj) {
 		PreparedStatement st = null;
 		try {
-			st = conn.prepareStatement("UPDATE cidades " + "SET cid_nome = ?, id_estados = ? " + "WHERE cid_id = ?");
+			st = conn.prepareStatement("UPDATE reunioes "
+					+ "SET reu_data = ?, reu_atendimento = ?, reu_tema = ?, reu_equipe_responsavel = ?, reu_observacoes = ?, id_pessoa = ? "
+					+ "WHERE reu_id = ?");
 
-			st.setString(1, obj.getCid_nome());
-			st.setInt(2, obj.getEstados().getEst_id());
-			st.setInt(3, obj.getCid_id());
+			st.setDate(1, (java.sql.Date) obj.getReu_data());
+			st.setString(2, obj.getReu_atendimento());
+			st.setString(3,obj.getReu_tema());
+			st.setString(4, obj.getReu_equipe_respons());
+			st.setString(5, obj.getReu_observacoes());
+			st.setInt(6, obj.getPessoas().getPes_id());
 
 			st.executeUpdate();
 		} catch (SQLException e) {
@@ -205,7 +88,7 @@ public class ReunioesCriancasDaoJDBC implements ReunioesCriancasDao {
 	public void deleteById(Integer id) {
 		PreparedStatement st = null;
 		try {
-			st = conn.prepareStatement("DELETE FROM cidades WHERE cid_id = ?");
+			st = conn.prepareStatement("DELETE FROM reunioes WHERE reu_id = ?");
 
 			st.setInt(1, id);
 
@@ -218,14 +101,75 @@ public class ReunioesCriancasDaoJDBC implements ReunioesCriancasDao {
 	}
 
 	@Override
-	public ReunioesCriancas findByData(Date data) {
+	public List<ReunioesCriancas> findByPessoa(Pessoas pessoa) {
+		PreparedStatement st = null;
+		ResultSet rs = null;
+		try {
+			st = conn.prepareStatement(
+					"SELECT reunioes.*, pessoas.pes_id as PesId, pessoas.pes_nome as PesNome "
+							+ "FROM reunioes INNER JOIN pessoas "
+							+ "ON reunioes.id_pessoa =  pessoas.pes_id "
+							+ "WHERE pessoas.pes_id = ? "
+							+ "ORDER BY pessoas.pes_nome");
+
+			st.setInt(1, pessoa.getPes_id());
+
+			rs = st.executeQuery();
+			
+			List<ReunioesCriancas> list = new ArrayList<>();
+			Map<Integer, Pessoas> map = new HashMap<>();
+
+			while (rs.next()) {
+				
+				Pessoas pes = map.get(rs.getInt("PesId"));
+				
+				if (pes == null) {
+				pes = instantiatePessoas(rs);
+				map.put(rs.getInt("PesId"), pes);
+				}
+				
+				ReunioesCriancas obj = instantiateReunioesCriancas(rs, pes);
+				list.add(obj);		
+			}
+			return list;
+		} catch (SQLException e) {
+			throw new DbException(e.getMessage());
+		} finally {
+			DB.closeStatement(st);
+			DB.closeResultSet(rs);
+		}
+
+	}
+
+	private ReunioesCriancas instantiateReunioesCriancas(ResultSet rs, Pessoas pes) throws SQLException {
+		ReunioesCriancas obj = new ReunioesCriancas();
+		obj.setReu_id(rs.getInt("reu_id"));
+		obj.setReu_data(rs.getDate("reu_data"));
+		obj.setReu_atendimento(rs.getString("reu_atendimento"));
+		obj.setReu_tema(rs.getString("reu_tema"));
+		obj.setReu_equipe_respons(rs.getString("reu_equipe_responsavel"));
+		obj.setReu_observacoes(rs.getString("reu_observacoes"));
+		obj.setPessoas(pes);
+		return obj;
+	}
+
+	private Pessoas instantiatePessoas(ResultSet rs) throws SQLException {
+		Pessoas pes = new Pessoas();
+		pes.setPes_id(rs.getInt("PesId"));
+		pes.setPes_nome(rs.getString("PesNome"));
+		return pes;
+	}
+
+	@Override
+	public List<ReunioesCriancas> findAll() {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public List<ReunioesCriancas> findByPessoas(Pessoas pessoas) {
+	public List<ReunioesCriancas> findByDataReuniao(Date data) {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
 }

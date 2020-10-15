@@ -11,7 +11,7 @@ public interface ReunioesCriancasDao {
 	void insert(ReunioesCriancas obj);
 	void update(ReunioesCriancas obj);
 	void deleteById(Integer id);
-	ReunioesCriancas findByData(Date data);
 	List<ReunioesCriancas> findAll();
-	List<ReunioesCriancas> findByPessoas(Pessoas pessoas);
+	List<ReunioesCriancas> findByDataReuniao(Date data);
+	List<ReunioesCriancas> findByPessoa(Pessoas pessoa);
 }
