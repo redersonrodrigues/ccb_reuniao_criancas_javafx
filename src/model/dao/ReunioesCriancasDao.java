@@ -1,6 +1,5 @@
 package model.dao;
 
-import java.util.Date;
 import java.util.List;
 
 import model.entities.Pessoas;
@@ -11,7 +10,9 @@ public interface ReunioesCriancasDao {
 	void insert(ReunioesCriancas obj);
 	void update(ReunioesCriancas obj);
 	void deleteById(Integer id);
+	ReunioesCriancas findById(Integer id);
+	ReunioesCriancas findByNome(String nome);
+	ReunioesCriancas findByDataReuniao(java.sql.Date date);
 	List<ReunioesCriancas> findAll();
-	List<ReunioesCriancas> findByDataReuniao(Date data);
 	List<ReunioesCriancas> findByPessoa(Pessoas pessoa);
 }

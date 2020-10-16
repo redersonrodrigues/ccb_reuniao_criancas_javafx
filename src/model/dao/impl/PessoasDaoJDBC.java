@@ -16,7 +16,6 @@ import db.DbIntegrityException;
 import model.dao.PessoasDao;
 import model.entities.Cidades;
 import model.entities.Equipes;
-import model.entities.Estados;
 import model.entities.Grupos;
 import model.entities.Pessoas;
 import model.entities.TiposUsuarios;

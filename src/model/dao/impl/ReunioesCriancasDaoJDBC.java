@@ -1,12 +1,12 @@
 package model.dao.impl;
 
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -69,14 +69,16 @@ public class ReunioesCriancasDaoJDBC implements ReunioesCriancasDao {
 					+ "SET reu_data = ?, reu_atendimento = ?, reu_tema = ?, reu_equipe_responsavel = ?, reu_observacoes = ?, id_pessoa = ? "
 					+ "WHERE reu_id = ?");
 
-			st.setDate(1, (java.sql.Date) obj.getReu_data());
+			st.setDate(1, new java.sql.Date( obj.getReu_data().getTime()));
 			st.setString(2, obj.getReu_atendimento());
 			st.setString(3,obj.getReu_tema());
 			st.setString(4, obj.getReu_equipe_respons());
 			st.setString(5, obj.getReu_observacoes());
 			st.setInt(6, obj.getPessoas().getPes_id());
+			st.setInt(7, obj.getReu_id());
 
 			st.executeUpdate();
+			
 		} catch (SQLException e) {
 			throw new DbException(e.getMessage());
 		} finally {
@@ -199,37 +201,28 @@ public class ReunioesCriancasDaoJDBC implements ReunioesCriancasDao {
 	}
 
 	@Override
-	public List<ReunioesCriancas> findByDataReuniao(Date data) {
+	public ReunioesCriancas findById(Integer id) {
 		PreparedStatement st = null;
 		ResultSet rs = null;
 		try {
 			st = conn.prepareStatement(
-					"SELECT reunioes.*, pessoas.pes_id as PesId, pessoas.pes_nome as PesNome "
-							+ "FROM reunioes INNER JOIN pessoas "
-							+ "ON reunioes.id_pessoa =  pessoas.pes_id "
-							+ "WHERE reunioes.reu_data = ? "
-							+ "ORDER BY reunioes.reu_data");
+			"SELECT reunioes.*, pessoas.pes_id as PesId, pessoas.pes_nome as PesNome "
+			+"FROM reunioes INNER JOIN pessoas "
+			+"ON reunioes.id_pessoa =  pessoas.pes_id "
+			+"WHERE reunioes.reu_id = ? "
+			+"ORDER BY PesNome ");
 
-			st.setDate(1, data);
-
+			st.setInt(1, id);
 			rs = st.executeQuery();
-			
-			List<ReunioesCriancas> list = new ArrayList<>();
-			Map<Integer, Pessoas> map = new HashMap<>();
-
-			while (rs.next()) {
-				
-				Pessoas pes = map.get(rs.getInt("PesId"));
-				
-				if (pes == null) {
-				pes = instantiatePessoas(rs);
-				map.put(rs.getInt("PesId"), pes);
-				}
+			// if para testar se veio algum resultado
+			if (rs.next()) {
+				Pessoas pes = instantiatePessoas(rs);
 				
 				ReunioesCriancas obj = instantiateReunioesCriancas(rs, pes);
-				list.add(obj);		
+				return obj;
 			}
-			return list;
+			return null;
+			
 		} catch (SQLException e) {
 			throw new DbException(e.getMessage());
 		} finally {
@@ -237,8 +230,73 @@ public class ReunioesCriancasDaoJDBC implements ReunioesCriancasDao {
 			DB.closeResultSet(rs);
 		}
 
+	}
 
+	@Override
+	public ReunioesCriancas findByNome(String nome) {
+		PreparedStatement st = null;
+		ResultSet rs = null;
+		try {
+			st = conn.prepareStatement(
+			"SELECT reunioes.*, pessoas.pes_id as PesId, pessoas.pes_nome as PesNome "
+			+"FROM reunioes INNER JOIN pessoas "
+			+"ON reunioes.id_pessoa =  pessoas.pes_id "
+			+"WHERE pessoas.pes_nome = ? "
+			+"ORDER BY PesNome ");
+
+			st.setString(1, nome);
+			rs = st.executeQuery();
+			// if para testar se veio algum resultado
+			if (rs.next()) {
+				Pessoas pes = instantiatePessoas(rs);
+				
+				ReunioesCriancas obj = instantiateReunioesCriancas(rs, pes);
+				return obj;
+			}
+			return null;
+			
+		} catch (SQLException e) {
+			throw new DbException(e.getMessage());
+		} finally {
+			DB.closeStatement(st);
+			DB.closeResultSet(rs);
+		}
+	}
+
+	@Override
+	public ReunioesCriancas findByDataReuniao(Date data) {
 		
+		PreparedStatement st = null;
+		ResultSet rs = null;
+		try {
+			st = conn.prepareStatement(
+			"SELECT reunioes.*, pessoas.pes_id as PesId, pessoas.pes_nome as PesNome "
+			+"FROM reunioes INNER JOIN pessoas "
+			+"ON reunioes.id_pessoa =  pessoas.pes_id "
+			+"WHERE reunioes.reu_data = ? "
+			+"ORDER BY PesNome ");
+			
+			st.setDate(1, data);
+			rs = st.executeQuery();
+			
+			
+			
+			// if para testar se veio algum resultado
+			if (rs.next()) {
+				Pessoas pes = instantiatePessoas(rs);
+				
+				ReunioesCriancas obj = instantiateReunioesCriancas(rs, pes);
+				return obj;
+			}
+			return null;
+			
+		} catch (SQLException e) {
+			throw new DbException(e.getMessage());
+		} 
+		finally {
+			DB.closeStatement(st);
+			DB.closeResultSet(rs);
+		}
 		
 	}
 
