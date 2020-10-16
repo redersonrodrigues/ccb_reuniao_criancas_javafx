@@ -36,7 +36,7 @@ public class ReunioesCriancasDaoJDBC implements ReunioesCriancasDao {
 					+ "VALUES (?, ?, ?, ?, ?, ?)",
 					Statement.RETURN_GENERATED_KEYS);
 
-			st.setDate(1, (java.sql.Date) obj.getReu_data());
+			st.setDate(1, new java.sql.Date( obj.getReu_data().getTime()));
 			st.setString(2, obj.getReu_atendimento());
 			st.setString(3, obj.getReu_tema());
 			st.setString(4, obj.getReu_equipe_respons());
@@ -162,14 +162,84 @@ public class ReunioesCriancasDaoJDBC implements ReunioesCriancasDao {
 
 	@Override
 	public List<ReunioesCriancas> findAll() {
-		// TODO Auto-generated method stub
-		return null;
+		PreparedStatement st = null;
+		ResultSet rs = null;
+		try {
+			st = conn.prepareStatement(
+					"SELECT reunioes.*, pessoas.pes_id as PesId, pessoas.pes_nome as PesNome "
+							+ "FROM reunioes INNER JOIN pessoas "
+							+ "ON reunioes.id_pessoa =  pessoas.pes_id "
+							+ "ORDER BY pessoas.pes_nome");
+
+			rs = st.executeQuery();
+			
+			List<ReunioesCriancas> list = new ArrayList<>();
+			Map<Integer, Pessoas> map = new HashMap<>();
+
+			while (rs.next()) {
+				
+				Pessoas pes = map.get(rs.getInt("PesId"));
+				
+				if (pes == null) {
+				pes = instantiatePessoas(rs);
+				map.put(rs.getInt("PesId"), pes);
+				}
+				
+				ReunioesCriancas obj = instantiateReunioesCriancas(rs, pes);
+				list.add(obj);		
+			}
+			return list;
+		} catch (SQLException e) {
+			throw new DbException(e.getMessage());
+		} finally {
+			DB.closeStatement(st);
+			DB.closeResultSet(rs);
+		}
+
 	}
 
 	@Override
 	public List<ReunioesCriancas> findByDataReuniao(Date data) {
-		// TODO Auto-generated method stub
-		return null;
+		PreparedStatement st = null;
+		ResultSet rs = null;
+		try {
+			st = conn.prepareStatement(
+					"SELECT reunioes.*, pessoas.pes_id as PesId, pessoas.pes_nome as PesNome "
+							+ "FROM reunioes INNER JOIN pessoas "
+							+ "ON reunioes.id_pessoa =  pessoas.pes_id "
+							+ "WHERE reunioes.reu_data = ? "
+							+ "ORDER BY reunioes.reu_data");
+
+			st.setDate(1, data);
+
+			rs = st.executeQuery();
+			
+			List<ReunioesCriancas> list = new ArrayList<>();
+			Map<Integer, Pessoas> map = new HashMap<>();
+
+			while (rs.next()) {
+				
+				Pessoas pes = map.get(rs.getInt("PesId"));
+				
+				if (pes == null) {
+				pes = instantiatePessoas(rs);
+				map.put(rs.getInt("PesId"), pes);
+				}
+				
+				ReunioesCriancas obj = instantiateReunioesCriancas(rs, pes);
+				list.add(obj);		
+			}
+			return list;
+		} catch (SQLException e) {
+			throw new DbException(e.getMessage());
+		} finally {
+			DB.closeStatement(st);
+			DB.closeResultSet(rs);
+		}
+
+
+		
+		
 	}
 
 }
