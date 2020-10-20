@@ -228,7 +228,7 @@ public class PessoasFormController implements Initializable {
 	// função para tratamento de restrições (constraints)
 	public void initializeNodes() {
 		Constraints.setTextFieldInteger(txtId);
-		Constraints.setTextFieldMaxLength(txtNome, 30);
+		Constraints.setTextFieldMaxLength(txtNome, 255);
 		Constraints.setTextFieldMaxLength(txtRg, 20);
 		Constraints.setTextFieldMaxLength(txtPai, 255);
 		Constraints.setTextFieldMaxLength(txtMae, 255);
