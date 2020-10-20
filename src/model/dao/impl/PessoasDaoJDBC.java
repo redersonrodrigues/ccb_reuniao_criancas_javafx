@@ -1,5 +1,9 @@
 package model.dao.impl;
 
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -10,9 +14,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.imageio.ImageIO;
+
 import db.DB;
 import db.DbException;
 import db.DbIntegrityException;
+import javafx.scene.image.Image;
 import model.dao.PessoasDao;
 import model.entities.Cidades;
 import model.entities.Equipes;
@@ -34,7 +41,14 @@ public class PessoasDaoJDBC implements PessoasDao {
 		ResultSet rs = null;
 		try {
 			st = conn.prepareStatement(
-			"SELECT p.*, g.nome as GpNom,g.id as id, c.cid_nome as CidNom, tu.tuser_nome as TuNom, e.equ_nome as EquNom FROM pessoas p, grupo_pessoa gp, grupos g, cidades c, tipos_usuarios tu, equipes e WHERE p.pes_id = ? AND gp.id_grupos = g.id AND p.pes_id = gp.id_pessoas");
+					"SELECT pessoas.*, cidades.cid_nome, equipes.equ_nome as EquNom, grupos.gru_id, grupos.gru_nome, tipos_usuarios.tuser_nome as TuNom "
+					+ "FROM pessoas "
+					+ "INNER JOIN cidades ON cidades.cid_id = pessoas.id_cidades "
+					+ "INNER JOIN equipes ON equipes.equ_id = pessoas.id_equipes "
+					+ "INNER JOIN grupos ON grupos.gru_id = pessoas.id_grupos "
+					+ "INNER JOIN tipos_usuarios ON tipos_usuarios.tuser_id = pessoas.id_tipos_usuarios "
+					+ "WHERE pessoas.pes_id = ? "
+			);
 
 			st.setInt(1, pes_id);
 			rs = st.executeQuery();
@@ -69,12 +83,14 @@ public class PessoasDaoJDBC implements PessoasDao {
 		Pessoas obj = new Pessoas();
 		obj.setPes_id(rs.getInt("pes_id"));
 		obj.setPes_nome(rs.getString("pes_nome"));
-		obj.setPes_foto(rs.getBytes("pes_foto"));
 		obj.setPes_rg(rs.getString("pes_rg"));
+		obj.setPes_pai(rs.getString("pes_pai"));
+		obj.setPes_mae(rs.getString("pes_mae"));
 		obj.setPes_endereco(rs.getString("pes_endereco"));
 		obj.setPes_bairro(rs.getString("pes_bairro"));
 		obj.setPes_telefone(rs.getString("pes_telefone"));
 		obj.setPes_celular(rs.getString("pes_celular"));
+		obj.setPes_observacoes(rs.getString("pes_observacoes"));
 		obj.setCidades(cidade);
 		obj.setTiposUsuarios(tipoUsuario);
 		obj.setEquipes(equipe);
@@ -91,8 +107,8 @@ public class PessoasDaoJDBC implements PessoasDao {
 
 	private Grupos instantiateGrupos(ResultSet rs) throws SQLException {
 		Grupos grupo = new Grupos();
-		grupo.setId(rs.getInt("id"));
-		grupo.setNome(rs.getString("GpNom"));
+		grupo.setGru_id(rs.getInt("gru_id"));
+		grupo.setGru_nome(rs.getString("gru_nome"));
 		return grupo;
 	}
 
@@ -106,7 +122,7 @@ public class PessoasDaoJDBC implements PessoasDao {
 	private Cidades instantiateCidades(ResultSet rs) throws SQLException {
 		Cidades cidade = new Cidades();
 		cidade.setCid_id(rs.getInt("id_cidades"));
-		cidade.setCid_nome(rs.getString("CidNom"));	
+		cidade.setCid_nome(rs.getString("cid_nome"));	
 		return cidade;
 	}
 	
@@ -117,7 +133,14 @@ public class PessoasDaoJDBC implements PessoasDao {
 		ResultSet rs = null;
 		try {
 			st = conn.prepareStatement(
-					"SELECT pessoas.*, c.cid_nome as CidNom, e.equ_nome as EquNom, g.id as id, g.nome as GpNom,gp.id_grupos as GpId, gp.id_pessoas as GpPes, tu.tuser_nome as TuNom FROM pessoas INNER JOIN (cidades c, equipes e, grupo_pessoa gp, grupos g, tipos_usuarios tu) ON (c.cid_id = pessoas.id_cidades AND pessoas.id_equipes = e.equ_id AND gp.id_pessoas = pessoas.pes_id AND g.id = gp.id_grupos AND tu.tuser_id = pessoas.id_tipos_usuarios) WHERE p.pes_id = ? ORDER BY p.pes_nome ");
+					"SELECT pessoas.*, cidades.cid_nome, equipes.equ_nome as EquNom, grupos.gru_id, grupos.gru_nome, tipos_usuarios.tuser_nome as TuNom "
+							+ "FROM pessoas "
+							+ "INNER JOIN cidades ON cidades.cid_id = pessoas.id_cidades "
+							+ "INNER JOIN equipes ON equipes.equ_id = pessoas.id_equipes "
+							+ "INNER JOIN grupos ON grupos.gru_id = pessoas.id_grupos "
+							+ "INNER JOIN tipos_usuarios ON tipos_usuarios.tuser_id = pessoas.id_tipos_usuarios "
+							+ "ORDER BY pessoas.pes_nome "
+					);
 
 
 			rs = st.executeQuery();
@@ -127,11 +150,11 @@ public class PessoasDaoJDBC implements PessoasDao {
 
 			while (rs.next()) {
 			
-				Grupos grupo = map.get(rs.getInt("Id"));
+				Grupos grupo = map.get(rs.getInt("pes_id"));
 
 				if (grupo == null) {
 					grupo = instantiateGrupos(rs);
-					map.put(rs.getInt("Id"), grupo);
+					map.put(rs.getInt("pes_id"), grupo);
 				}
 
 				Equipes equipe = instantiateEquipes(rs);
@@ -160,7 +183,14 @@ public class PessoasDaoJDBC implements PessoasDao {
 		ResultSet rs = null;
 		try {
 			st = conn.prepareStatement(
-			"SELECT pessoas.*, c.cid_nome as CidNom, e.equ_nome as EquNom, g.id as id, g.nome as GpNom,gp.id_grupos as GpId, gp.id_pessoas as GpPes, tu.tuser_nome as TuNom FROM pessoas INNER JOIN (cidades c, equipes e, grupo_pessoa gp, grupos g, tipos_usuarios tu) ON (c.cid_id = pessoas.id_cidades AND pessoas.id_equipes = e.equ_id AND gp.id_pessoas = pessoas.pes_id AND g.id = gp.id_grupos AND tu.tuser_id = pessoas.id_tipos_usuarios) WHERE c.cid_id = ? ORDER BY c.cid_nome");   
+					"SELECT pessoas.*, grupos.gru_nome, grupos.gru_id, cidades.cid_nome as CidNom, tipos_usuarios.tuser_nome as TuNom, equipes.equ_nome as EquNom "
+							+ "FROM pessoas "
+							+ "INNER JOIN grupos ON grupos.gru_id = pessoas.id_grupos "
+							+ "INNER JOIN cidades ON cidades.cid_id = pessoas.id_cidades "
+							+ "INNER JOIN tipos_usuarios ON tipos_usuarios.tuser_id = pessoas.id_tipos_usuarios "
+							+ "INNER JOIN equipes ON equipes.equ_id = pessoas.id_equipes "
+							+ "WHERE pessoas.id_cidades = ? "
+							+ "ORDER BY pessoas.pes_nome ");   
 			
 			st.setInt(1, cid.getCid_id());
 			rs = st.executeQuery();
@@ -203,21 +233,36 @@ public class PessoasDaoJDBC implements PessoasDao {
 		PreparedStatement st = null;
 		try {
 			st = conn.prepareStatement(
-					"INSERT INTO pessoas"
-					+ " (pes_nome, pes_foto, pes_rg, pes_endereco, pes_bairro, pes_telefone, pes_celular, id_cidades, id_tipos_usuarios, id_equipes) "
-					+ " VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);"
-					,Statement.RETURN_GENERATED_KEYS);
+					"INSERT INTO pessoas "
+					+ " (pes_nome, pes_rg, pes_pai, pes_mae, pes_endereco, pes_bairro, pes_telefone, pes_celular, id_cidades, id_grupos, id_equipes, id_tipos_usuarios, pes_observacoes) "
+					+ " VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+					, Statement.RETURN_GENERATED_KEYS);	
+												
+					
 
 			st.setString(1, obj.getPes_nome());
-			st.setInt(2, obj.getCidades().getCid_id());
-
+			st.setString(2, obj.getPes_rg());
+			st.setString(3, obj.getPes_pai());
+			st.setString(4, obj.getPes_mae());
+			st.setString(5, obj.getPes_endereco());
+			st.setString(6, obj.getPes_bairro());
+			st.setString(7, obj.getPes_telefone());
+			st.setString(8, obj.getPes_celular());
+			st.setInt(9, obj.getCidades().getCid_id());
+			st.setInt(10, obj.getGrupos().getGru_id());
+			st.setInt(11, obj.getEquipes().getEqu_id());
+			st.setInt(12, obj.getTiposUsuarios().getTuser_id());
+			st.setString(13, obj.getPes_observacoes());
 			int rowsAffected = st.executeUpdate();
-
+			
+			
+			
 			if (rowsAffected > 0) {
 				ResultSet rs = st.getGeneratedKeys();
 				if (rs.next()) {
 					int pes_id = rs.getInt(1);
 					obj.setPes_id(pes_id);
+								
 				}
 			} else {
 				throw new DbException("Unexpected error! No rows affected!");
@@ -233,11 +278,24 @@ public class PessoasDaoJDBC implements PessoasDao {
 	public void update(Pessoas obj) {
 		PreparedStatement st = null;
 		try {
-			st = conn.prepareStatement("UPDATE cidades " + "SET cid_nome = ?, id_estados = ? " + "WHERE cid_id = ?");
+			st = conn.prepareStatement("UPDATE pessoas "
+					+ "SET pes_nome = ?, pes_rg = ?, pes_pai = ?, pes_mae = ?, pes_endereco = ?, pes_bairro = ?, pes_telefone = ?, pes_celular = ?, id_cidades = ?, id_grupos = ?, id_equipes = ?, id_tipos_usuarios = ?, pes_observacoes = ? "
+					+ "WHERE pes_id = ?");
 
 			st.setString(1, obj.getPes_nome());
-			st.setInt(2, obj.getCidades().getCid_id());
-			st.setInt(3, obj.getPes_id());
+			st.setString(2, obj.getPes_rg());
+			st.setString(3, obj.getPes_pai());
+			st.setString(4, obj.getPes_mae());
+			st.setString(5, obj.getPes_endereco());
+			st.setString(6, obj.getPes_bairro());
+			st.setString(7, obj.getPes_telefone());
+			st.setString(8, obj.getPes_celular());
+			st.setInt(9, obj.getCidades().getCid_id());
+			st.setInt(10, obj.getGrupos().getGru_id());
+			st.setInt(11, obj.getEquipes().getEqu_id());
+			st.setInt(12, obj.getTiposUsuarios().getTuser_id());
+			st.setString(13, obj.getPes_observacoes());
+			st.setInt(14, obj.getPes_id());
 
 			st.executeUpdate();
 		} catch (SQLException e) {
@@ -251,7 +309,7 @@ public class PessoasDaoJDBC implements PessoasDao {
 	public void deleteById(Integer pes_id) {
 		PreparedStatement st = null;
 		try {
-			st = conn.prepareStatement("DELETE FROM cidades WHERE cid_id = ?");
+			st = conn.prepareStatement("DELETE FROM pessoas WHERE pes_id = ?");
 
 			st.setInt(1, pes_id);
 
@@ -269,7 +327,14 @@ public class PessoasDaoJDBC implements PessoasDao {
 		ResultSet rs = null;
 		try {
 			st = conn.prepareStatement(
-			"SELECT pessoas.*, c.cid_nome as CidNom, e.equ_nome as EquNom, g.id as id, g.nome as GpNom,gp.id_grupos as GpId, gp.id_pessoas as GpPes, tu.tuser_nome as TuNom FROM pessoas INNER JOIN (cidades c, equipes e, grupo_pessoa gp, grupos g, tipos_usuarios tu) ON (c.cid_id = pessoas.id_cidades AND pessoas.id_equipes = e.equ_id AND gp.id_pessoas = pessoas.pes_id AND g.id = gp.id_grupos AND tu.tuser_id = pessoas.id_tipos_usuarios) WHERE e.equ_id = ? ORDER BY e.equ_nome");   
+					"SELECT pessoas.*, grupos.gru_nome, grupos.gru_id, cidades.cid_nome as CidNom, tipos_usuarios.tuser_nome as TuNom, equipes.equ_nome as EquNom "
+							+ "FROM pessoas "
+							+ "INNER JOIN grupos ON grupos.gru_id = pessoas.id_grupos "
+							+ "INNER JOIN cidades ON cidades.cid_id = pessoas.id_cidades "
+							+ "INNER JOIN tipos_usuarios ON tipos_usuarios.tuser_id = pessoas.id_tipos_usuarios "
+							+ "INNER JOIN equipes ON equipes.equ_id = pessoas.id_equipes "
+							+ "WHERE pessoas.id_equipes = ? "
+							+ "ORDER BY pessoas.pes_nome ");      
 			
 			st.setInt(1, equ.getEqu_id());
 			rs = st.executeQuery();
@@ -313,7 +378,14 @@ public class PessoasDaoJDBC implements PessoasDao {
 		ResultSet rs = null;
 		try {
 			st = conn.prepareStatement(
-			"SELECT pessoas.*, c.cid_nome as CidNom, e.equ_nome as EquNom, g.id as id, g.nome as GpNom,gp.id_grupos as GpId, gp.id_pessoas as GpPes, tu.tuser_nome as TuNom FROM pessoas INNER JOIN (cidades c, equipes e, grupo_pessoa gp, grupos g, tipos_usuarios tu) ON (c.cid_id = pessoas.id_cidades AND pessoas.id_equipes = e.equ_id AND gp.id_pessoas = pessoas.pes_id AND g.id = gp.id_grupos AND tu.tuser_id = pessoas.id_tipos_usuarios) WHERE c.cid_id = ? ORDER BY c.cid_nome");   
+			"SELECT pessoas.*, grupos.gru_nome, grupos.gru_id, cidades.cid_nome as CidNom, tipos_usuarios.tuser_nome as TuNom, equipes.equ_nome as EquNom "
+			+ "FROM pessoas "
+			+ "INNER JOIN grupos ON grupos.gru_id = pessoas.id_grupos "
+			+ "INNER JOIN cidades ON cidades.cid_id = pessoas.id_cidades "
+			+ "INNER JOIN tipos_usuarios ON tipos_usuarios.tuser_id = pessoas.id_tipos_usuarios "
+			+ "INNER JOIN equipes ON equipes.equ_id = pessoas.id_equipes "
+			+ "WHERE pessoas.id_tipos_usuarios = ? "
+			+ "ORDER BY pessoas.pes_nome ");   
 			
 			st.setInt(1, tus.getTuser_id());
 			rs = st.executeQuery();
@@ -357,9 +429,16 @@ public class PessoasDaoJDBC implements PessoasDao {
 		ResultSet rs = null;
 		try {
 			st = conn.prepareStatement(
-			"SELECT pessoas.*, c.cid_nome as CidNom, e.equ_nome as EquNom, g.id as id, g.nome as GpNom,gp.id_grupos as GpId, gp.id_pessoas as GpPes, tu.tuser_nome as TuNom FROM pessoas INNER JOIN (cidades c, equipes e, grupo_pessoa gp, grupos g, tipos_usuarios tu) ON (c.cid_id = pessoas.id_cidades AND pessoas.id_equipes = e.equ_id AND gp.id_pessoas = pessoas.pes_id AND g.id = gp.id_grupos AND tu.tuser_id = pessoas.id_tipos_usuarios) WHERE c.cid_id = ? ORDER BY c.cid_nome");   
+			"SELECT pessoas.*, grupos.gru_nome, grupos.gru_id, cidades.cid_nome as CidNom, tipos_usuarios.tuser_nome as TuNom, equipes.equ_nome as EquNom "
+			+ "FROM pessoas "
+			+ "INNER JOIN grupos ON grupos.gru_id = pessoas.id_grupos "
+			+ "INNER JOIN cidades ON cidades.cid_id = pessoas.id_cidades "
+			+ "INNER JOIN tipos_usuarios ON tipos_usuarios.tuser_id = pessoas.id_tipos_usuarios "
+			+ "INNER JOIN equipes ON equipes.equ_id = pessoas.id_equipes "
+			+ "WHERE pessoas.id_grupos = ? "
+			+ "ORDER BY pessoas.pes_nome");   
 			
-			st.setInt(1, gru.getId());
+			st.setInt(1, gru.getGru_id());
 			rs = st.executeQuery();
 			
 			List<Pessoas> list = new ArrayList<>();
@@ -368,11 +447,11 @@ public class PessoasDaoJDBC implements PessoasDao {
 			// if para testar se veio algum resultado
 			while (rs.next()) {
 				
-				Grupos grupo = map.get(rs.getInt("id"));
+				Grupos grupo = map.get(rs.getInt("gru_id"));
 				
 				if(grupo == null) {
 					grupo = instantiateGrupos(rs);
-					map.put(rs.getInt("id"), grupo);
+					map.put(rs.getInt("gru_id"), grupo);
 				}
 				
 				
@@ -401,7 +480,13 @@ public class PessoasDaoJDBC implements PessoasDao {
 		ResultSet rs = null;
 		try {
 			st = conn.prepareStatement(
-			"SELECT p.*, g.nome as GpNom,g.id as id, c.cid_nome as CidNom, tu.tuser_nome as TuNom, e.equ_nome as EquNom FROM pessoas p, grupo_pessoa gp, grupos g, cidades c, tipos_usuarios tu, equipes e WHERE p.pes_nome = ? AND gp.id_grupos = g.id AND p.pes_id = gp.id_pessoas");
+			"SELECT pessoas.*, grupos.gru_nome, grupos.gru_id, cidades.cid_nome as CidNom, tipos_usuarios.tuser_nome as TuNom, equipes.equ_nome as EquNom "
+			+ "FROM pessoas "
+			+ "INNER JOIN grupos ON grupos.gru_id = pessoas.id_grupos "
+			+ "INNER JOIN cidades ON cidades.cid_id = pessoas.id_cidades "
+			+ "INNER JOIN tipos_usuarios ON tipos_usuarios.tuser_id = pessoas.id_tipos_usuarios "
+			+ "INNER JOIN equipes ON equipes.equ_id = pessoas.id_equipes "
+			+ "WHERE pessoas.pes_nome = ?");
 
 			st.setString(1, nome);
 			rs = st.executeQuery();

@@ -29,60 +29,61 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.Pane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import model.entities.Grupos;
-import model.services.GruposService;
+import model.entities.ReunioesCriancas;
+import model.services.ReunioesCriancasService;
+import model.services.EstadosService;
 
-public class GruposListController implements Initializable, DataChangeListener {
+public class ReunioesCriancasListController implements Initializable, DataChangeListener {
 	
 	//declarando dependencia lista de grupos mock
-	private GruposService service;
+	private ReunioesCriancasService service;
 	
 	
 
 	@FXML
-	private TableView<Grupos> tableViewGrupos;
+	private TableView<ReunioesCriancas> tableViewReunioesCriancas;
 	
 	@FXML
-	private TableColumn<Grupos, Integer> tableColumnId;
+	private TableColumn<ReunioesCriancas, Integer> tableColumnId;
 	
 	@FXML
-	private TableColumn<Grupos, String> tableColumnNome;
+	private TableColumn<ReunioesCriancas, String> tableColumnNome;
 	
 	@FXML
-	private TableColumn<Grupos, Grupos> tableColumnEDIT;
+	private TableColumn<ReunioesCriancas, ReunioesCriancas> tableColumnEDIT;
 	
 	@FXML
-	private TableColumn<Grupos, Grupos> tableColumnREMOVE;
+	private TableColumn<ReunioesCriancas, ReunioesCriancas> tableColumnREMOVE;
 	
 	@FXML
 	private Button btNovo;
 	
 	
-	private ObservableList<Grupos> obsList;
+	private ObservableList<ReunioesCriancas> obsList;
 	
 	
 	@FXML
 	public void onBtNovoAction(ActionEvent event) {
 		//acessa o Stage da tela referência
 		Stage parentStage = Utils.currentStage(event);
-		Grupos obj = new Grupos();
+		ReunioesCriancas obj = new ReunioesCriancas();
 		//repasso o Stage adquirido com a classe criada para abstrai-lo como o segundo paramentro para abrir a tela.
-		createDialogForm(obj, "/gui/GruposForm.fxml", parentStage);
+		createDialogForm(obj, "/gui/ReunioesCriancasForm.fxml", parentStage);
 		
 	}
 	
 	
-	public void setGruposService(GruposService service) {
+	public void setReunioesCriancasService(ReunioesCriancasService service) {
 		this.service = service;
 	}
 
 	private void initEditButtons() {
 		tableColumnEDIT.setCellValueFactory(param -> new ReadOnlyObjectWrapper<>(param.getValue()));
-		tableColumnEDIT.setCellFactory(param -> new TableCell<Grupos, Grupos>(){
+		tableColumnEDIT.setCellFactory(param -> new TableCell<ReunioesCriancas, ReunioesCriancas>(){
 			private final Button button = new Button("edit");
 			
 			@Override
-			protected void updateItem(Grupos obj, boolean empty) {
+			protected void updateItem(ReunioesCriancas obj, boolean empty) {
 				super.updateItem(obj, empty);
 				
 				if (obj == null) {
@@ -92,7 +93,7 @@ public class GruposListController implements Initializable, DataChangeListener {
 				
 				setGraphic(button);
 				button.setOnAction(
-						event -> createDialogForm(obj, "/gui/GruposForm.fxml", Utils.currentStage(event)
+						event -> createDialogForm(obj, "/gui/ReunioesCriancasForm.fxml", Utils.currentStage(event)
 						));
 			}
 			
@@ -109,11 +110,11 @@ public class GruposListController implements Initializable, DataChangeListener {
 
 	private void initRemoveButtons() {
 		tableColumnREMOVE.setCellValueFactory(param -> new ReadOnlyObjectWrapper<>(param.getValue()));
-		tableColumnREMOVE.setCellFactory(param -> new TableCell<Grupos, Grupos>(){
+		tableColumnREMOVE.setCellFactory(param -> new TableCell<ReunioesCriancas, ReunioesCriancas>(){
 			private final Button button = new Button("deletar");
 			
 			@Override
-			protected void updateItem(Grupos obj, boolean empty) {
+			protected void updateItem(ReunioesCriancas obj, boolean empty) {
 				super.updateItem(obj, empty);
 				
 				if (obj == null) {
@@ -130,7 +131,7 @@ public class GruposListController implements Initializable, DataChangeListener {
 		});
 	}
 
-	private void removeEntity(Grupos obj) {
+	private void removeEntity(ReunioesCriancas obj) {
 		
 	Optional<ButtonType> result =	Alerts.showConfirmation("Confirmação!",	"Realmente deseja deletar(apagar definitivamente)?");
 	if (result.get() == ButtonType.OK) {
@@ -150,38 +151,42 @@ public class GruposListController implements Initializable, DataChangeListener {
 
 	private void InitializeNodes() {
 
-		tableColumnId.setCellValueFactory(new PropertyValueFactory<>("gru_id"));
-		tableColumnNome.setCellValueFactory(new PropertyValueFactory<>("gru_nome"));
+		tableColumnId.setCellValueFactory(new PropertyValueFactory<>("reu_id"));
+		tableColumnNome.setCellValueFactory(new PropertyValueFactory<>("reu_atendimento"));
+
 		
 		//para a tabela acompanhar altura e largura da tela
 		Stage stage = (Stage) Main.getMainScene().getWindow();
-		tableViewGrupos.prefHeightProperty().bind(stage.heightProperty());
+		tableViewReunioesCriancas.prefHeightProperty().bind(stage.heightProperty());
 		
 	}
 	
-	// carrager a obsList para depois associar a lista Grupos e mostrar na tela
+	// carrager a obsList para depois associar a lista ReunioesCriancas e mostrar na tela
 	public void updateTableView() {
 		if (service == null) {
 			throw new IllegalStateException("o service estava nulo");	
 		}
-		List<Grupos> list = service.findAll();
+		List<ReunioesCriancas> list = service.findAll();
 		obsList = FXCollections.observableArrayList(list);
-		tableViewGrupos.setItems(obsList);
+		tableViewReunioesCriancas.setItems(obsList);
 		initEditButtons(); // acrescentará um novo botão com o texto edit em cada linha da tabela
 		initRemoveButtons();// acrescentando um novo botao em cada linha, como o edit, para remoção de itens
 	}
 	
-	private void createDialogForm(Grupos obj, String absoluteName, Stage parenteStage) {
+	private void createDialogForm(ReunioesCriancas obj, String absoluteName, Stage parenteStage) {
 		try {
 			//carrega a view atraves da variavel absoluteName
 			FXMLLoader loader = new FXMLLoader(getClass().getResource(absoluteName));
 			Pane pane = loader.load();
 			
 			// passos para carregar dados
-			GruposFormController controller = loader.getController();
-			controller.setGrupos(obj);
-			controller.setGruposService(new GruposService());//injeção de dependencia GruposServices para carregamento
-			controller.subscribeDataChangeListener(this);// se inscrevendo para observar listeners (onDataChanged)
+			ReunioesCriancasFormController controller = loader.getController();
+			controller.setReunioesCriancas(obj);
+			controller.setReunioesCriancasServices(new ReunioesCriancasService(), new EstadosService());//injeção de dependencia ReunioesCriancasServices para carregamento
+			
+			controller.loadAssociatedObjects(); // carrega estados do banco de dados e deixa no controller
+			
+ 			controller.subscribeDataChangeListener(this);// se inscrevendo para observar listeners (onDataChanged)
 			controller.updateFormData();
 			
 			
@@ -197,8 +202,8 @@ public class GruposListController implements Initializable, DataChangeListener {
 			
 		} 
 		catch (IOException e) {
-				e.printStackTrace();
-				Alerts.showAlert("IO Exception", "Error loading view", e.getMessage(), AlertType.ERROR);
+			e.printStackTrace();
+			Alerts.showAlert("IO Exception", "Error loading view", e.getMessage(), AlertType.ERROR);
 		}
 	}
 

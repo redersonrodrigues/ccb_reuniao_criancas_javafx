@@ -7,36 +7,37 @@ public class Grupos  implements Serializable{
 	private static final long serialVersionUID = 1L;
 	
 	
-	private Integer id;
-	private String nome;
+	private Integer gru_id;
+	private String gru_nome;
 	
 	
 	public Grupos() {}
 
 
-	public Grupos(Integer id, String nome) {
-		this.id = id;
-		this.nome = nome;
+	public Grupos(Integer gru_id, String gru_nome) {
+		super();
+		this.gru_id = gru_id;
+		this.gru_nome = gru_nome;
 	}
 
 
-	public Integer getId() {
-		return id;
+	public Integer getGru_id() {
+		return gru_id;
 	}
 
 
-	public void setId(Integer id) {
-		this.id = id;
+	public void setGru_id(Integer gru_id) {
+		this.gru_id = gru_id;
 	}
 
 
-	public String getNome() {
-		return nome;
+	public String getGru_nome() {
+		return gru_nome;
 	}
 
 
-	public void setNome(String nome) {
-		this.nome = nome;
+	public void setGru_nome(String gru_nome) {
+		this.gru_nome = gru_nome;
 	}
 
 
@@ -44,7 +45,7 @@ public class Grupos  implements Serializable{
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((id == null) ? 0 : id.hashCode());
+		result = prime * result + ((gru_id == null) ? 0 : gru_id.hashCode());
 		return result;
 	}
 
@@ -58,10 +59,10 @@ public class Grupos  implements Serializable{
 		if (getClass() != obj.getClass())
 			return false;
 		Grupos other = (Grupos) obj;
-		if (id == null) {
-			if (other.id != null)
+		if (gru_id == null) {
+			if (other.gru_id != null)
 				return false;
-		} else if (!id.equals(other.id))
+		} else if (!gru_id.equals(other.gru_id))
 			return false;
 		return true;
 	}
@@ -69,10 +70,8 @@ public class Grupos  implements Serializable{
 
 	@Override
 	public String toString() {
-		return "Grupos [id=" + id + ", nome=" + nome + "]";
+		return "Grupos [gru_id=" + gru_id + ", gru_nome=" + gru_nome + "]";
 	}
-	
-	
-	
+
 
 }

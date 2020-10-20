@@ -9,13 +9,14 @@ public class Pessoas implements Serializable{
 	
 	private Integer pes_id;
 	private String pes_nome;
-	private byte[] pes_foto;
 	private String pes_rg;
+	private String pes_pai;
+	private String pes_mae;
 	private String pes_endereco;
 	private String pes_bairro;
 	private String pes_telefone;
 	private String pes_celular;
-	
+	private String pes_observacoes;
 	private Cidades cidades;
 	private Equipes equipes;
 	private Grupos grupos;
@@ -23,18 +24,20 @@ public class Pessoas implements Serializable{
 	
 	public Pessoas() {}
 
-	public Pessoas(Integer pes_id, String pes_nome, byte[] pes_foto, String pes_rg, String pes_endereco,
-			String pes_bairro, String pes_telefone, String pes_celular, Cidades cidades, Equipes equipes, Grupos grupos,
-			TiposUsuarios tiposUsuarios) {
+	public Pessoas(Integer pes_id, String pes_nome, String pes_rg, String pes_pai, String pes_mae, String pes_endereco,
+			String pes_bairro, String pes_telefone, String pes_celular, String pes_observacoes, Cidades cidades,
+			Equipes equipes, Grupos grupos, TiposUsuarios tiposUsuarios) {
 		super();
 		this.pes_id = pes_id;
 		this.pes_nome = pes_nome;
-		this.pes_foto = pes_foto;
 		this.pes_rg = pes_rg;
+		this.pes_pai = pes_pai;
+		this.pes_mae = pes_mae;
 		this.pes_endereco = pes_endereco;
 		this.pes_bairro = pes_bairro;
 		this.pes_telefone = pes_telefone;
 		this.pes_celular = pes_celular;
+		this.pes_observacoes = pes_observacoes;
 		this.cidades = cidades;
 		this.equipes = equipes;
 		this.grupos = grupos;
@@ -57,20 +60,28 @@ public class Pessoas implements Serializable{
 		this.pes_nome = pes_nome;
 	}
 
-	public byte[] getPes_foto() {
-		return pes_foto;
-	}
-
-	public void setPes_foto(byte[] pes_foto) {
-		this.pes_foto = pes_foto;
-	}
-
 	public String getPes_rg() {
 		return pes_rg;
 	}
 
 	public void setPes_rg(String pes_rg) {
 		this.pes_rg = pes_rg;
+	}
+
+	public String getPes_pai() {
+		return pes_pai;
+	}
+
+	public void setPes_pai(String pes_pai) {
+		this.pes_pai = pes_pai;
+	}
+
+	public String getPes_mae() {
+		return pes_mae;
+	}
+
+	public void setPes_mae(String pes_mae) {
+		this.pes_mae = pes_mae;
 	}
 
 	public String getPes_endereco() {
@@ -103,6 +114,14 @@ public class Pessoas implements Serializable{
 
 	public void setPes_celular(String pes_celular) {
 		this.pes_celular = pes_celular;
+	}
+
+	public String getPes_observacoes() {
+		return pes_observacoes;
+	}
+
+	public void setPes_observacoes(String pes_observacoes) {
+		this.pes_observacoes = pes_observacoes;
 	}
 
 	public Cidades getCidades() {
@@ -164,11 +183,14 @@ public class Pessoas implements Serializable{
 
 	@Override
 	public String toString() {
-		return "Pessoas [pes_id=" + pes_id + ", pes_nome=" + pes_nome + ", pes_foto=" + Arrays.toString(pes_foto)
-				+ ", pes_rg=" + pes_rg + ", pes_endereco=" + pes_endereco + ", pes_bairro=" + pes_bairro
-				+ ", pes_telefone=" + pes_telefone + ", pes_celular=" + pes_celular + ", cidades=" + cidades
-				+ ", equipes=" + equipes + ", grupos=" + grupos + ", tiposUsuarios=" + tiposUsuarios + "]";
+		return "Pessoas [pes_id=" + pes_id + ", pes_nome=" + pes_nome + ", pes_rg=" + pes_rg + ", pes_pai=" + pes_pai
+				+ ", pes_mae=" + pes_mae + ", pes_endereco=" + pes_endereco + ", pes_bairro=" + pes_bairro
+				+ ", pes_telefone=" + pes_telefone + ", pes_celular=" + pes_celular + ", pes_observacoes="
+				+ pes_observacoes + ", cidades=" + cidades + ", equipes=" + equipes + ", grupos=" + grupos
+				+ ", tiposUsuarios=" + tiposUsuarios + "]";
 	}
 
+	
+	
 		
 }

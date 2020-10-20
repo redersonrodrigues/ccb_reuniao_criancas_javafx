@@ -20,6 +20,8 @@ import model.services.CidadesService;
 import model.services.EquipesService;
 import model.services.EstadosService;
 import model.services.GruposService;
+import model.services.PessoasService;
+import model.services.ReunioesCriancasService;
 import model.services.TiposUsuariosService;
 
 public class MainViewController implements Initializable {
@@ -42,12 +44,22 @@ public class MainViewController implements Initializable {
 
 	@FXML
 	public void onMenuItemReunioesAction() {
-		System.out.println("onMenuItemReunioesAction");
+		//System.out.println("onMenuItemReunioesAction");
+		loadView("/gui/ReunioesCriancasList.fxml", (ReunioesCriancasListController controller) ->{
+			controller.setReunioesCriancasService(new ReunioesCriancasService());
+			controller.updateTableView();
+			
+		});
 	}
 
 	@FXML
 	public void onMenuItemPessoasAction() {
-		System.out.println("onMenuItemPessoasAction");
+		//System.out.println("onMenuItemPessoasAction");
+		loadView("/gui/PessoasList.fxml", (PessoasListController controller) ->{
+			controller.setPessoasService(new PessoasService());
+			controller.updateTableView();
+			
+		});
 	}
 
 	@FXML

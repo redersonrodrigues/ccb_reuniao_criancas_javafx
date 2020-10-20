@@ -12,24 +12,35 @@ import gui.listeners.DataChangeListener;
 import gui.util.Alerts;
 import gui.util.Constraints;
 import gui.util.Utils;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListCell;
+import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
-import model.entities.Grupos;
+import javafx.util.Callback;
+import model.entities.Estados;
+import model.entities.ReunioesCriancas;
 import model.exceptions.ValidationException;
-import model.services.GruposService;
+import model.services.EstadosService;
+import model.services.ReunioesCriancasService;
 
-public class GruposFormController implements Initializable{
+public class ReunioesCriancasFormController implements Initializable{
 	
 	// injeção de dependencia para a entidade relacionada a este formulário
-	private Grupos entity;
+	private ReunioesCriancas entity;
 	
-	// injeção dependência GruposService
-	private GruposService service;
+	// injeção dependência ReunioesCriancasService
+	private ReunioesCriancasService service;
+	
+	// injeção de dependencia EstadosService
+	private EstadosService estadosService;
 	
 	private List<DataChangeListener> dataChangeListeners = new ArrayList<>();
 	
@@ -43,7 +54,13 @@ public class GruposFormController implements Initializable{
 	private TextField txtNome;
 	
 	@FXML
+	private ComboBox<Estados> comboBoxEstados;
+	
+	@FXML
 	private Label labelErrorNome;
+	
+	@FXML
+	private Label labelErrorSigla;
 	
 	@FXML
 	private Button btSalvar;
@@ -52,14 +69,20 @@ public class GruposFormController implements Initializable{
 	private Button btCancelar;
 	
 	
-	public void setGrupos(Grupos entity) {
+	private ObservableList<Estados> obsList;
+	
+	
+	
+	
+	public void setReunioesCriancas(ReunioesCriancas entity) {
 		this.entity = entity;
 	}
 
 	
 	
-	public void setGruposService(GruposService service) {
+	public void setReunioesCriancasServices(ReunioesCriancasService service, EstadosService estadoService) {
 		this.service = service;
+		this.estadosService = estadoService;
 	}
 
 
@@ -108,13 +131,13 @@ public class GruposFormController implements Initializable{
 
 
 	// metodo para capturar o que esta nos campos do formulario e instanciar um grupo
-	private Grupos getFormData() {
+	private ReunioesCriancas getFormData() {
 		
-		Grupos obj = new Grupos();
+		ReunioesCriancas obj = new ReunioesCriancas();
 		
 		ValidationException exception = new ValidationException("Validation error");
 
-		obj.setGru_id(Utils.tryParseToInt(txtId.getText()));
+		obj.setReu_id(Utils.tryParseToInt(txtId.getText()));
 		
 		if (txtNome.getText() == null || txtNome.getText().trim().equals("")) {
 		
@@ -122,7 +145,10 @@ public class GruposFormController implements Initializable{
 		
 		}
 		
-		obj.setGru_nome(txtNome.getText());
+		obj.setReu_atendimento(txtNome.getText());
+		
+		//obj.setEstados(comboBoxEstados.getValue());
+		
 		
 		if (exception.getErrors().size() > 0) {
 			throw exception;
@@ -154,6 +180,8 @@ public class GruposFormController implements Initializable{
 	public void initializeNodes() {
 		Constraints.setTextFieldInteger(txtId);
 		Constraints.setTextFieldMaxLength(txtNome, 30);
+		
+		initializeComboBoxEstados();
 	}
 	
 	public void updateFormData() {
@@ -161,23 +189,52 @@ public class GruposFormController implements Initializable{
 			throw new IllegalStateException("Entity was null");
 		}
 				
-		txtId.setText(String.valueOf(entity.getGru_id()));
-		txtNome.setText(entity.getGru_nome());
+		txtId.setText(String.valueOf(entity.getReu_id()));
+		txtNome.setText(entity.getReu_atendimento());
 		
+		/*if ( entity.getEstados() == null) {
+			comboBoxEstados.getSelectionModel().selectFirst();
+		}
+		else {
+		comboBoxEstados.setValue(entity.getEstados());
+		}
+		*/
 		
 	}
+	
+	public void loadAssociatedObjects() {
+		if (estadosService == null) {
+			throw new IllegalStateException("EstadosService was null");
+		}
+		
+		List<Estados> list = estadosService.findAll();
+		obsList = FXCollections.observableArrayList(list);
+		comboBoxEstados.setItems(obsList);
+	}
+	
 	
 	private void setErrorMessages(Map<String, String> errors) {
 		
 		Set<String> fields = errors.keySet();
 		
 		if (fields.contains("gru_nome")) {
-			
-			labelErrorNome.setText(errors.get("gru_nome"));
-			
-			
+			labelErrorNome.setText(errors.get("gru_nome"));	
 		}
 		
+	}
+	
+	private void initializeComboBoxEstados() {
+		Callback<ListView<Estados>, ListCell<Estados>> factory = lv ->  new ListCell<Estados>() {
+			@Override
+			protected void updateItem(Estados item, boolean empty) {
+				super.updateItem(item, empty);
+				setText(empty ? "" : item.getEst_nome());
+			}
+			
+		};
+		
+		comboBoxEstados.setCellFactory(factory);
+		comboBoxEstados.setButtonCell(factory.call(null));
 	}
 	
 

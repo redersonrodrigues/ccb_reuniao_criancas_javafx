@@ -15,7 +15,7 @@ public class GruposService {
 	}
 
 	public void saveOrUpdate(Grupos obj) {
-		if (obj.getId() == null) {
+		if (obj.getGru_id() == null) {
 			dao.insert(obj);
 		} else {
 			dao.update(obj);
@@ -23,11 +23,11 @@ public class GruposService {
 	}
 
 	public void remove(Grupos obj) {
-		dao.deleteById(obj.getId());
+		dao.deleteById(obj.getGru_id());
 	}
 	
 	public void savaOrUpdate(Grupos obj) {
-		if (obj.getId() == null) {
+		if (obj.getGru_id() == null) {
 			
 			dao.insert(obj);
 			

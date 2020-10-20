@@ -28,13 +28,13 @@ public class GruposDaoJDBC implements GruposDao {
 		ResultSet rs = null;
 		try {
 			st = conn.prepareStatement(
-				"SELECT * FROM grupos WHERE Id = ?");
+				"SELECT * FROM grupos WHERE gru_id = ?");
 			st.setInt(1, id);
 			rs = st.executeQuery();
 			if (rs.next()) {
 				Grupos obj = new Grupos();
-				obj.setId(rs.getInt("Id"));
-				obj.setNome(rs.getString("Nome"));
+				obj.setGru_id(rs.getInt("gru_id"));
+				obj.setGru_nome(rs.getString("gru_nome"));
 				return obj;
 			}
 			return null;
@@ -54,15 +54,15 @@ public class GruposDaoJDBC implements GruposDao {
 		ResultSet rs = null;
 		try {
 			st = conn.prepareStatement(
-				"SELECT * FROM grupos ORDER BY nome");
+				"SELECT * FROM grupos ORDER BY gru_nome");
 			rs = st.executeQuery();
 
 			List<Grupos> list = new ArrayList<>();
 
 			while (rs.next()) {
 				Grupos obj = new Grupos();
-				obj.setId(rs.getInt("Id"));
-				obj.setNome(rs.getString("Nome"));
+				obj.setGru_id(rs.getInt("gru_id"));
+				obj.setGru_nome(rs.getString("gru_nome"));
 				list.add(obj);
 			}
 			return list;
@@ -82,12 +82,12 @@ public class GruposDaoJDBC implements GruposDao {
 		try {
 			st = conn.prepareStatement(
 				"INSERT INTO grupos " +
-				"(Nome) " +
+				"(gru_nome) " +
 				"VALUES " +
 				"(?)", 
 				Statement.RETURN_GENERATED_KEYS);
 
-			st.setString(1, obj.getNome());
+			st.setString(1, obj.getGru_nome());
 
 			int rowsAffected = st.executeUpdate();
 			
@@ -95,7 +95,7 @@ public class GruposDaoJDBC implements GruposDao {
 				ResultSet rs = st.getGeneratedKeys();
 				if (rs.next()) {
 					int id = rs.getInt(1);
-					obj.setId(id);
+					obj.setGru_id(id);
 				}
 			}
 			else {
@@ -116,11 +116,11 @@ public class GruposDaoJDBC implements GruposDao {
 		try {
 			st = conn.prepareStatement(
 				"UPDATE grupos " +
-				"SET Nome = ? " +
-				"WHERE Id = ?");
+				"SET gru_nome = ? " +
+				"WHERE gru_id = ?");
 
-			st.setString(1, obj.getNome());
-			st.setInt(2, obj.getId());
+			st.setString(1, obj.getGru_nome());
+			st.setInt(2, obj.getGru_id());
 
 			st.executeUpdate();
 		}
@@ -137,7 +137,7 @@ public class GruposDaoJDBC implements GruposDao {
 		PreparedStatement st = null;
 		try {
 			st = conn.prepareStatement(
-				"DELETE FROM grupos WHERE Id = ?");
+				"DELETE FROM grupos WHERE gru_id = ?");
 
 			st.setInt(1, id);
 
