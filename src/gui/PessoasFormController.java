@@ -1,9 +1,6 @@
 package gui;
 
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -11,32 +8,25 @@ import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
 
-import javax.swing.JOptionPane;
-
 import db.DbException;
 import gui.listeners.DataChangeListener;
 import gui.util.Alerts;
 import gui.util.Constraints;
-import gui.util.ManipularImagem;
 import gui.util.Utils;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.Scene;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.VBox;
-import javafx.stage.FileChooser;
-import javafx.stage.Stage;
 import javafx.util.Callback;
 import model.entities.Cidades;
 import model.entities.Equipes;
@@ -75,6 +65,12 @@ public class PessoasFormController implements Initializable {
 
 	@FXML
 	private TextField txtRg;
+	
+	@FXML
+	private TextField txtPai;
+
+	@FXML
+	private TextField txtMae;
 
 	@FXML
 	private TextField txtEndereco;
@@ -99,6 +95,10 @@ public class PessoasFormController implements Initializable {
 
 	@FXML
 	private ComboBox<Equipes> comboBoxEquipes;
+	
+	@FXML
+	private TextArea txtObservacoes;
+
 
 	@FXML
 	private ImageView lblImagem;
@@ -191,18 +191,18 @@ public class PessoasFormController implements Initializable {
 		}
 
 		obj.setPes_nome(txtNome.getText());
-		// obj.setPes_foto(imageViewFoto.getImage();
 		obj.setPes_rg(txtRg.getText());
+		obj.setPes_pai(txtPai.getText());
+		obj.setPes_mae(txtMae.getText());
 		obj.setPes_endereco(txtEndereco.getText());
 		obj.setPes_bairro(txtBairro.getText());
 		obj.setPes_telefone(txtTelefone.getText());
 		obj.setPes_celular(txtCelular.getText());
-
 		obj.setCidades(comboBoxCidades.getValue());
 		obj.setGrupos(comboBoxGrupos.getValue());
 		obj.setEquipes(comboBoxEquipes.getValue());
 		obj.setTiposUsuarios(comboBoxTiposUsuarios.getValue());
-
+		obj.setPes_observacoes(txtObservacoes.getText());
 		if (exception.getErrors().size() > 0) {
 			throw exception;
 		}
@@ -219,48 +219,6 @@ public class PessoasFormController implements Initializable {
 
 	}
 
-	@FXML
-	public void onBtFotoAction(ActionEvent event) {
-		Stage primaryStage = null;
-		primaryStage.setTitle("JavaFX App");
-
-		FileChooser fc = new FileChooser();
-
-		Button button = new Button("Select File");
-		button.setOnAction(e -> {
-			File file = fc.showOpenDialog(primaryStage);
-
-			if (file != null) {
-
-				imagem = ManipularImagem.setImagemDimensao(file.getAbsolutePath(), 160, 160);
-				FileInputStream input;
-				try {
-					input = new FileInputStream(imagem.toString());
-					Image img = new Image(input);
-					ImageView imageView = new ImageView(img);
-				} catch (FileNotFoundException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
-
-				// lblImagem.setIcon(new ImageIcon(imagem));
-
-				// System.out.println(ex.printStackTrace().toString());
-
-			} else {
-				JOptionPane.showMessageDialog(null, "Voce nao selecionou nenhum arquivo.");
-			}
-
-		});
-
-		VBox vBox = new VBox(button);
-		Scene scene = new Scene(vBox, 960, 600);
-
-		primaryStage.setScene(scene);
-		primaryStage.show();
-
-	}
-
 	@Override
 	public void initialize(URL url, ResourceBundle rb) {
 		initializeNodes();
@@ -272,11 +230,13 @@ public class PessoasFormController implements Initializable {
 		Constraints.setTextFieldInteger(txtId);
 		Constraints.setTextFieldMaxLength(txtNome, 30);
 		Constraints.setTextFieldMaxLength(txtRg, 20);
+		Constraints.setTextFieldMaxLength(txtPai, 255);
+		Constraints.setTextFieldMaxLength(txtMae, 255);
 		Constraints.setTextFieldMaxLength(txtEndereco, 255);
 		Constraints.setTextFieldMaxLength(txtBairro, 255);
 		Constraints.setTextFieldMaxLength(txtTelefone, 20);
 		Constraints.setTextFieldMaxLength(txtCelular, 20);
-
+		
 		initializeComboBoxCidades();
 		initializeComboBoxGrupos();
 		initializeComboBoxTiposUsuarios();
@@ -346,13 +306,14 @@ public class PessoasFormController implements Initializable {
 
 		txtId.setText(String.valueOf(entity.getPes_id()));
 		txtNome.setText(entity.getPes_nome());
-		lblImagem.setImage(null);
-
 		txtRg.setText(entity.getPes_rg());
+		txtPai.setText(entity.getPes_pai());
+		txtMae.setText(entity.getPes_mae());
 		txtEndereco.setText(entity.getPes_endereco());
 		txtBairro.setText(entity.getPes_bairro());
 		txtTelefone.setText(entity.getPes_telefone());
 		txtCelular.setText(entity.getPes_celular());
+		txtObservacoes.setText(entity.getPes_observacoes());
 
 		if (entity.getCidades() == null) {
 			comboBoxCidades.getSelectionModel().selectFirst();

@@ -127,13 +127,14 @@ public class PessoasListController implements Initializable, DataChangeListener 
 	@FXML
 	public void onBtAlterarAction(ActionEvent event) {
 		
-		
+		System.out.println("Teste btalterar");
 		
 	}
 	
 	@FXML
 	public void onBtRemoverAction(ActionEvent event) {
-		
+		System.out.println("Teste btRemover");
+
 		
 	}
 	
