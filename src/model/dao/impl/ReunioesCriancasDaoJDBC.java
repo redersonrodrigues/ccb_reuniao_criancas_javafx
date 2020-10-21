@@ -6,6 +6,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -146,6 +147,7 @@ public class ReunioesCriancasDaoJDBC implements ReunioesCriancasDao {
 	private ReunioesCriancas instantiateReunioesCriancas(ResultSet rs, Pessoas pes) throws SQLException {
 		ReunioesCriancas obj = new ReunioesCriancas();
 		obj.setReu_id(rs.getInt("reu_id"));
+		
 		obj.setReu_data(rs.getDate("reu_data"));
 		obj.setReu_atendimento(rs.getString("reu_atendimento"));
 		obj.setReu_tema(rs.getString("reu_tema"));
@@ -172,7 +174,7 @@ public class ReunioesCriancasDaoJDBC implements ReunioesCriancasDao {
 							+ "FROM reunioes INNER JOIN pessoas "
 							+ "ON reunioes.id_pessoa =  pessoas.pes_id "
 							+ "ORDER BY pessoas.pes_nome");
-
+			
 			rs = st.executeQuery();
 			
 			List<ReunioesCriancas> list = new ArrayList<>();

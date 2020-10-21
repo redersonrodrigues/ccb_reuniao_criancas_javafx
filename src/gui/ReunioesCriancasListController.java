@@ -2,6 +2,8 @@ package gui;
 
 import java.io.IOException;
 import java.net.URL;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
@@ -11,7 +13,8 @@ import db.DbIntegrityException;
 import gui.listeners.DataChangeListener;
 import gui.util.Alerts;
 import gui.util.Utils;
-import javafx.beans.property.ReadOnlyObjectWrapper;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -19,204 +22,239 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
-import javafx.scene.control.TableCell;
+import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableColumn.CellDataFeatures;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.Pane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.util.Callback;
 import model.entities.ReunioesCriancas;
+import model.services.CidadesService;
+import model.services.EquipesService;
+import model.services.GruposService;
 import model.services.ReunioesCriancasService;
-import model.services.EstadosService;
 
 public class ReunioesCriancasListController implements Initializable, DataChangeListener {
-	
-	//declarando dependencia lista de grupos mock
+
+	// declarando dependencia lista de grupos mock
 	private ReunioesCriancasService service;
-	
-	
+
+	@FXML
+	private Button btNovo;
+
+	@FXML
+	private Button btAlterar;
+
+	@FXML
+	private Button btRemover;
 
 	@FXML
 	private TableView<ReunioesCriancas> tableViewReunioesCriancas;
-	
+
 	@FXML
-	private TableColumn<ReunioesCriancas, Integer> tableColumnId;
-	
+	private TableColumn<ReunioesCriancas, String> tableColumnReuniaoData;
+
 	@FXML
-	private TableColumn<ReunioesCriancas, String> tableColumnNome;
-	
+	private TableColumn<ReunioesCriancas, String> tableColumnReuniaoEquipeResponsavel;
+
 	@FXML
-	private TableColumn<ReunioesCriancas, ReunioesCriancas> tableColumnEDIT;
-	
+	private Label lblReuniaoId;
+
 	@FXML
-	private TableColumn<ReunioesCriancas, ReunioesCriancas> tableColumnREMOVE;
-	
+	private Label lblReuniaoData;
+
 	@FXML
-	private Button btNovo;
+	private Label lblReuniaoAtendimento;
+
+	@FXML
+	private Label lblReuniaoTema;
+
+	@FXML
+	private Label lblReuniaoEquipeResponsavel;
+
+	@FXML
+	private Label lblReuniaoObservacoes;
+
+	@FXML
+	private TextArea txtPessoas;
 	
-	
+	List<ReunioesCriancas> list;
+
 	private ObservableList<ReunioesCriancas> obsList;
-	
-	
+
 	@FXML
 	public void onBtNovoAction(ActionEvent event) {
-		//acessa o Stage da tela referência
+		// acessa o Stage da tela referência
 		Stage parentStage = Utils.currentStage(event);
 		ReunioesCriancas obj = new ReunioesCriancas();
-		//repasso o Stage adquirido com a classe criada para abstrai-lo como o segundo paramentro para abrir a tela.
+		// repasso o Stage adquirido com a classe criada para abstrai-lo como o segundo
+		// paramentro para abrir a tela.
 		createDialogForm(obj, "/gui/ReunioesCriancasForm.fxml", parentStage);
-		
+
 	}
-	
-	
+
+	@FXML
+	public void onBtAlterarAction(ActionEvent event) {
+
+		ReunioesCriancas reuniao = tableViewReunioesCriancas.getSelectionModel().getSelectedItem();
+		if (reuniao != null) {
+			// acessa o Stage da tela referência
+			Stage parentStage = Utils.currentStage(event);
+			// repasso o Stage adquirido com a classe criada para abstrai-lo como o segundo
+			// paramentro para abrir a tela.
+			createDialogForm(reuniao, "/gui/ReunioesCriancasForm.fxml", parentStage);
+
+		} else {
+			Alert alert = new Alert(Alert.AlertType.ERROR);
+			alert.setContentText("Por favor, escolha um cliente na tabela!");
+		}
+
+	}
+
+	@FXML
+	public void onBtRemoverAction(ActionEvent event) {
+		ReunioesCriancas reuniao = tableViewReunioesCriancas.getSelectionModel().getSelectedItem();
+		if (reuniao != null) {
+			removeEntity(reuniao);
+		} else {
+			Alert alert = new Alert(Alert.AlertType.ERROR);
+			alert.setContentText("Por favor, escolha um cliente na tabela!");
+		}
+
+	}
+
 	public void setReunioesCriancasService(ReunioesCriancasService service) {
 		this.service = service;
 	}
 
-	private void initEditButtons() {
-		tableColumnEDIT.setCellValueFactory(param -> new ReadOnlyObjectWrapper<>(param.getValue()));
-		tableColumnEDIT.setCellFactory(param -> new TableCell<ReunioesCriancas, ReunioesCriancas>(){
-			private final Button button = new Button("edit");
-			
-			@Override
-			protected void updateItem(ReunioesCriancas obj, boolean empty) {
-				super.updateItem(obj, empty);
-				
-				if (obj == null) {
-					setGraphic(null);
-					return;
-				}
-				
-				setGraphic(button);
-				button.setOnAction(
-						event -> createDialogForm(obj, "/gui/ReunioesCriancasForm.fxml", Utils.currentStage(event)
-						));
-			}
-			
-		});
-	}
-	
-	
 	@Override
 	public void initialize(URL url, ResourceBundle rb) {
-		//metodo auxiliar apra abertura das tabelas
+		// metodo auxiliar apra abertura das tabelas
 		InitializeNodes();
-		
-	}
 
-	private void initRemoveButtons() {
-		tableColumnREMOVE.setCellValueFactory(param -> new ReadOnlyObjectWrapper<>(param.getValue()));
-		tableColumnREMOVE.setCellFactory(param -> new TableCell<ReunioesCriancas, ReunioesCriancas>(){
-			private final Button button = new Button("deletar");
-			
-			@Override
-			protected void updateItem(ReunioesCriancas obj, boolean empty) {
-				super.updateItem(obj, empty);
-				
-				if (obj == null) {
-					setGraphic(null);
-					return;
-				}
-				
-				setGraphic(button);
-				button.setOnAction(
-						event -> removeEntity(obj)
-						);
-			}
-			
-		});
+		// Listem acionado diante de quaisquer alterações na seleção de itens no
+		// TableView
+		tableViewReunioesCriancas.getSelectionModel().selectedItemProperty()
+				.addListener((observable, oldValue, newValue) -> selecionarItemTableViewReunioesCriancas(newValue));
+
 	}
 
 	private void removeEntity(ReunioesCriancas obj) {
-		
-	Optional<ButtonType> result =	Alerts.showConfirmation("Confirmação!",	"Realmente deseja deletar(apagar definitivamente)?");
-	if (result.get() == ButtonType.OK) {
-		if (service == null) {
-			throw new IllegalStateException("Service was null!");
-		}
-		try {
-		service.remove(obj);
-		updateTableView();
-		}
-		catch (DbIntegrityException e) {
-			Alerts.showAlert("Error removing object", null, e.getMessage(), AlertType.ERROR);
-		}
-	}	
-	}
 
+		Optional<ButtonType> result = Alerts.showConfirmation("Confirmação!",
+				"Realmente deseja deletar(apagar definitivamente)?");
+		if (result.get() == ButtonType.OK) {
+			if (service == null) {
+				throw new IllegalStateException("Service was null!");
+			}
+			try {
+				service.remove(obj);
+				updateTableView();
+			} catch (DbIntegrityException e) {
+				Alerts.showAlert("Error removing object", null, e.getMessage(), AlertType.ERROR);
+			}
+		}
+	}
 
 	private void InitializeNodes() {
+		// Metodo para formatar data padrao brasileiro na tableView
+		SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+		tableColumnReuniaoData.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<ReunioesCriancas,String>, ObservableValue<String>>() {
+		public ObservableValue<String> call(CellDataFeatures<ReunioesCriancas, String> cell) {
+            final ReunioesCriancas record = cell.getValue();
 
-		tableColumnId.setCellValueFactory(new PropertyValueFactory<>("reu_id"));
-		tableColumnNome.setCellValueFactory(new PropertyValueFactory<>("reu_atendimento"));
+            final SimpleObjectProperty<String> simpleObject = new SimpleObjectProperty<String>(sdf.format(record.getReu_data()));
+        return simpleObject;
+        }
+		});	
+		//tableColumnReuniaoData.setCellValueFactory(new PropertyValueFactory<>(sdf.format("reu_data")));
 
-		
-		//para a tabela acompanhar altura e largura da tela
+		tableColumnReuniaoEquipeResponsavel.setCellValueFactory(new PropertyValueFactory<>("reu_equipe_respons"));
+
+		// para a tabela acompanhar altura e largura da tela
 		Stage stage = (Stage) Main.getMainScene().getWindow();
 		tableViewReunioesCriancas.prefHeightProperty().bind(stage.heightProperty());
-		
+
 	}
-	
+
 	// carrager a obsList para depois associar a lista ReunioesCriancas e mostrar na tela
 	public void updateTableView() {
 		if (service == null) {
-			throw new IllegalStateException("o service estava nulo");	
+			throw new IllegalStateException("o service estava nulo");
 		}
 		List<ReunioesCriancas> list = service.findAll();
 		obsList = FXCollections.observableArrayList(list);
 		tableViewReunioesCriancas.setItems(obsList);
-		initEditButtons(); // acrescentará um novo botão com o texto edit em cada linha da tabela
-		initRemoveButtons();// acrescentando um novo botao em cada linha, como o edit, para remoção de itens
+
 	}
-	
+
 	private void createDialogForm(ReunioesCriancas obj, String absoluteName, Stage parenteStage) {
 		try {
-			//carrega a view atraves da variavel absoluteName
+			// carrega a view atraves da variavel absoluteName
 			FXMLLoader loader = new FXMLLoader(getClass().getResource(absoluteName));
 			Pane pane = loader.load();
-			
+
 			// passos para carregar dados
 			ReunioesCriancasFormController controller = loader.getController();
 			controller.setReunioesCriancas(obj);
-			controller.setReunioesCriancasServices(new ReunioesCriancasService(), new EstadosService());//injeção de dependencia ReunioesCriancasServices para carregamento
-			
+			controller.setReunioesCriancasServices(new ReunioesCriancasService());// injeção de dependencia ReunioesCriancasServices para
+																		// carregamento
+
 			controller.loadAssociatedObjects(); // carrega estados do banco de dados e deixa no controller
-			
- 			controller.subscribeDataChangeListener(this);// se inscrevendo para observar listeners (onDataChanged)
+
+				controller.subscribeDataChangeListener(this);// se inscrevendo para observar listeners (onDataChanged)
 			controller.updateFormData();
-			
-			
+
 			// passos para abrir um formulario modal a partir de outro de referência
 			Stage dialogStage = new Stage();
-			dialogStage.setTitle("Entre com os dados do grupo: ");
+			dialogStage.setTitle("Entre com os dados da Reunião: ");
 			dialogStage.setScene(new Scene(pane));
 			dialogStage.setResizable(false);
 			dialogStage.initOwner(parenteStage);
 			dialogStage.initModality(Modality.WINDOW_MODAL);
 			dialogStage.showAndWait();
-			
-			
-		} 
-		catch (IOException e) {
+
+		} catch (IOException e) {
 			e.printStackTrace();
 			Alerts.showAlert("IO Exception", "Error loading view", e.getMessage(), AlertType.ERROR);
 		}
 	}
 
-
 	@Override
 	public void onDataChanged() {
 
 		updateTableView();
-		
+
 	}
-	
-	
-	
-	
+
+	public void selecionarItemTableViewReunioesCriancas(ReunioesCriancas reuniao) {
+		if (reuniao != null) {
+			lblReuniaoId.setText(String.valueOf(reuniao.getReu_id()));
+			SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy");
+			lblReuniaoData.setText(df.format(reuniao.getReu_data()));
+			lblReuniaoAtendimento.setText(reuniao.getReu_atendimento());
+			lblReuniaoTema.setText(reuniao.getReu_tema());
+			lblReuniaoEquipeResponsavel.setText(reuniao.getReu_equipe_respons());
+			lblReuniaoObservacoes.setText(reuniao.getReu_observacoes());
+
+			
+		} else {
+			lblReuniaoId.setText("");
+			lblReuniaoData.setText("");
+			lblReuniaoAtendimento.setText("");
+			lblReuniaoTema.setText("");
+			lblReuniaoEquipeResponsavel.setText("");
+			lblReuniaoObservacoes.setText("");			txtPessoas.setText("");
+
+		}
+	}
 
 }
