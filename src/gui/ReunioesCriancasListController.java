@@ -2,6 +2,7 @@ package gui;
 
 import java.io.IOException;
 import java.net.URL;
+import java.sql.Date;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
@@ -32,11 +33,7 @@ import javafx.scene.layout.Pane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import model.entities.ReunioesCriancas;
-import model.services.CidadesService;
-import model.services.EquipesService;
-import model.services.GruposService;
 import model.services.ReunioesCriancasService;
-import model.services.TiposUsuariosService;
 
 public class ReunioesCriancasListController implements Initializable, DataChangeListener {
 
@@ -56,16 +53,10 @@ public class ReunioesCriancasListController implements Initializable, DataChange
 	private TableView<ReunioesCriancas> tableViewReunioesCriancas;
 
 	@FXML
-	private TableColumn<ReunioesCriancas, String> tableColumnPessoaTelefone;
+	private TableColumn<ReunioesCriancas, Integer> tableColumnReuniaoId;
 
 	@FXML
-	private TableColumn<ReunioesCriancas, String> tableColumnPessoaNome;
-
-	@FXML
-	private TableColumn<ReunioesCriancas, ReunioesCriancas> tableColumnReuniaoId;
-
-	@FXML
-	private TableColumn<ReunioesCriancas, ReunioesCriancas> tableColumnReuniaoData;
+	private TableColumn<ReunioesCriancas, Date> tableColumnReuniaoData;
 	
 	@FXML
 	private TableColumn<ReunioesCriancas, ReunioesCriancas> tableColumnReuniaoParticipante;
@@ -202,11 +193,9 @@ public class ReunioesCriancasListController implements Initializable, DataChange
 			// passos para carregar dados
 			ReunioesCriancasFormController controller = loader.getController();
 			controller.setReunioesCriancas(obj);
-			controller.setReunioesCriancasServices(new ReunioesCriancasService(), new CidadesService(), new GruposService(),
-					new EquipesService(), new TiposUsuariosService());// injeção de dependencia ReunioesCriancasServices para
-																		// carregamento
+			controller.setReunioesCriancasServices(new ReunioesCriancasService());// injeção de dependencia ReunioesCriancasServices para carregamento
 
-			controller.loadAssociatedObjects(); // carrega estados do banco de dados e deixa no controller
+			controller.loadAssociatedObjects(); // carrega reunioes do banco de dados e deixa no controller
 
 			controller.subscribeDataChangeListener(this);// se inscrevendo para observar listeners (onDataChanged)
 			controller.updateFormData();

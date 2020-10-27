@@ -1,7 +1,7 @@
 package gui;
 
-import java.awt.image.BufferedImage;
 import java.net.URL;
+import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -13,8 +13,6 @@ import gui.listeners.DataChangeListener;
 import gui.util.Alerts;
 import gui.util.Constraints;
 import gui.util.Utils;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -28,17 +26,10 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.image.ImageView;
 import javafx.util.Callback;
-import model.entities.Cidades;
-import model.entities.Equipes;
-import model.entities.Grupos;
+import model.entities.Pessoas;
 import model.entities.ReunioesCriancas;
-import model.entities.TiposUsuarios;
 import model.exceptions.ValidationException;
-import model.services.CidadesService;
-import model.services.EquipesService;
-import model.services.GruposService;
 import model.services.ReunioesCriancasService;
-import model.services.TiposUsuariosService;
 
 public class ReunioesCriancasFormController implements Initializable {
 
@@ -48,57 +39,33 @@ public class ReunioesCriancasFormController implements Initializable {
 	// injeção dependência ReunioesCriancasService
 	private ReunioesCriancasService service;
 
-	// injeção de dependencia CidadesService, GruposService, EquipesService,
-	// TiposUsuariosService
-	private CidadesService cidadesService;
-	private GruposService gruposService;
-	private EquipesService equipesService;
-	private TiposUsuariosService tiposUsuariosService;
-
+	
 	private List<DataChangeListener> dataChangeListeners = new ArrayList<>();
 
 	@FXML
 	private TextField txtId;
 
 	@FXML
-	private TextField txtNome;
+	private TextField txtData;
 
 	@FXML
-	private TextField txtRg;
+	private TextField txtHorario;
 	
 	@FXML
-	private TextField txtPai;
+	private TextField txtAtendimento;
 
 	@FXML
-	private TextField txtMae;
+	private TextField txtTema;
 
 	@FXML
-	private TextField txtEndereco;
+	private TextField txtEquipeResponsavel;
 
-	@FXML
-	private TextField txtBairro;
-
-	@FXML
-	private TextField txtTelefone;
-
-	@FXML
-	private TextField txtCelular;
-
-	@FXML
-	private ComboBox<Cidades> comboBoxCidades;
-
-	@FXML
-	private ComboBox<Grupos> comboBoxGrupos;
-
-	@FXML
-	private ComboBox<TiposUsuarios> comboBoxTiposUsuarios;
-
-	@FXML
-	private ComboBox<Equipes> comboBoxEquipes;
-	
 	@FXML
 	private TextArea txtObservacoes;
 
+	@FXML
+	private ComboBox<Pessoas> comboBoxPessoas;
+	
 
 	@FXML
 	private ImageView lblImagem;
@@ -110,32 +77,22 @@ public class ReunioesCriancasFormController implements Initializable {
 	private Label labelErrorSigla;
 
 	@FXML
-	private Button btFoto;
-
-	@FXML
 	private Button btSalvar;
 
 	@FXML
 	private Button btCancelar;
+	
+	@FXML
+	private Button btAdicionar;
 
-	private ObservableList<Cidades> obsList;
-	private ObservableList<Grupos> obsList2;
-	private ObservableList<Equipes> obsList3;
-	private ObservableList<TiposUsuarios> obsList4;
-
-	BufferedImage imagem;
-
+	
 	public void setReunioesCriancas(ReunioesCriancas entity) {
 		this.entity = entity;
 	}
 
-	public void setReunioesCriancasServices(ReunioesCriancasService service, CidadesService cidadeService, GruposService gruposService,
-			EquipesService equipesService, TiposUsuariosService tiposUsuariosService) {
+	public void setReunioesCriancasServices(ReunioesCriancasService service) {
 		this.service = service;
-		this.cidadesService = cidadeService;
-		this.gruposService = gruposService;
-		this.equipesService = equipesService;
-		this.tiposUsuariosService = tiposUsuariosService;
+		
 	}
 
 	// metodo para se inscrever na lista
@@ -184,25 +141,19 @@ public class ReunioesCriancasFormController implements Initializable {
 
 		obj.setReu_id(Utils.tryParseToInt(txtId.getText()));
 
-		if (txtNome.getText() == null || txtNome.getText().trim().equals("")) {
+		if (txtData.getText() == null || txtData.getText().trim().equals("")) {
 
 			exception.addError("nome", "O campo não pode ser vazio!");
 
 		}
 
-		obj.setReu_nome(txtNome.getText());
-		obj.setReu_rg(txtRg.getText());
-		obj.setReu_pai(txtPai.getText());
-		obj.setReu_mae(txtMae.getText());
-		obj.setReu_endereco(txtEndereco.getText());
-		obj.setReu_bairro(txtBairro.getText());
-		obj.setReu_telefone(txtTelefone.getText());
-		obj.setReu_celular(txtCelular.getText());
-		obj.setCidades(comboBoxCidades.getValue());
-		obj.setGrupos(comboBoxGrupos.getValue());
-		obj.setEquipes(comboBoxEquipes.getValue());
-		obj.setTiposUsuarios(comboBoxTiposUsuarios.getValue());
+		obj.setReu_data(Date.valueOf(txtData.getText()).toLocalDate());
+		obj.setReu_horario(txtHorario.getText());
+		obj.setReu_atendimento(txtAtendimento.getText());
+		obj.setReu_tema(txtTema.getText());
+		obj.setReu_equipe_respons(txtEquipeResponsavel.getText());
 		obj.setReu_observacoes(txtObservacoes.getText());
+		
 		if (exception.getErrors().size() > 0) {
 			throw exception;
 		}
@@ -228,151 +179,55 @@ public class ReunioesCriancasFormController implements Initializable {
 	// função para tratamento de restrições (constraints)
 	public void initializeNodes() {
 		Constraints.setTextFieldInteger(txtId);
-		Constraints.setTextFieldMaxLength(txtNome, 255);
-		Constraints.setTextFieldMaxLength(txtRg, 20);
-		Constraints.setTextFieldMaxLength(txtPai, 255);
-		Constraints.setTextFieldMaxLength(txtMae, 255);
-		Constraints.setTextFieldMaxLength(txtEndereco, 255);
-		Constraints.setTextFieldMaxLength(txtBairro, 255);
-		Constraints.setTextFieldMaxLength(txtTelefone, 20);
-		Constraints.setTextFieldMaxLength(txtCelular, 20);
-		
-		initializeComboBoxCidades();
-		initializeComboBoxGrupos();
-		initializeComboBoxTiposUsuarios();
-		initializeComboBoxEquipes();
-	}
+		Constraints.setTextFieldMaxLength(txtData, 20);
+		Constraints.setTextFieldMaxLength(txtHorario, 20);
+		Constraints.setTextFieldMaxLength(txtAtendimento, 255);
+		Constraints.setTextFieldMaxLength(txtTema, 255);
+		Constraints.setTextFieldMaxLength(txtEquipeResponsavel, 255);
+		initializeComboBoxPessoas();
+		}
 
-	private void initializeComboBoxCidades() {
-		Callback<ListView<Cidades>, ListCell<Cidades>> factory = lv -> new ListCell<Cidades>() {
+	private void initializeComboBoxPessoas() {
+		Callback<ListView<Pessoas>, ListCell<Pessoas>> factory = lv -> new ListCell<Pessoas>() {
 			@Override
-			protected void updateItem(Cidades item, boolean empty) {
+			protected void updateItem(Pessoas item, boolean empty) {
 				super.updateItem(item, empty);
-				setText(empty ? "" : item.getCid_nome());
+				setText(empty ? "" : item.getPes_nome());
 			}
 
 		};
 
-		comboBoxCidades.setCellFactory(factory);
-		comboBoxCidades.setButtonCell(factory.call(null));
+		comboBoxPessoas.setCellFactory(factory);
+		comboBoxPessoas.setButtonCell(factory.call(null));
 	}
 
-	private void initializeComboBoxEquipes() {
-		Callback<ListView<Equipes>, ListCell<Equipes>> factory = lv -> new ListCell<Equipes>() {
-			@Override
-			protected void updateItem(Equipes item, boolean empty) {
-				super.updateItem(item, empty);
-				setText(empty ? "" : item.getEqu_nome());
-			}
-
-		};
-
-		comboBoxEquipes.setCellFactory(factory);
-		comboBoxEquipes.setButtonCell(factory.call(null));
-	}
-
-	private void initializeComboBoxTiposUsuarios() {
-		Callback<ListView<TiposUsuarios>, ListCell<TiposUsuarios>> factory = lv -> new ListCell<TiposUsuarios>() {
-			@Override
-			protected void updateItem(TiposUsuarios item, boolean empty) {
-				super.updateItem(item, empty);
-				setText(empty ? "" : item.getTuser_nome());
-			}
-
-		};
-
-		comboBoxTiposUsuarios.setCellFactory(factory);
-		comboBoxTiposUsuarios.setButtonCell(factory.call(null));
-	}
-
-	private void initializeComboBoxGrupos() {
-		Callback<ListView<Grupos>, ListCell<Grupos>> factory = lv -> new ListCell<Grupos>() {
-			@Override
-			protected void updateItem(Grupos item, boolean empty) {
-				super.updateItem(item, empty);
-				setText(empty ? "" : item.getGru_nome());
-			}
-
-		};
-
-		comboBoxGrupos.setCellFactory(factory);
-		comboBoxGrupos.setButtonCell(factory.call(null));
-	}
-
+	
 	public void updateFormData() {
 		if (entity == null) {
 			throw new IllegalStateException("Entity was null");
 		}
 
 		txtId.setText(String.valueOf(entity.getReu_id()));
-		txtNome.setText(entity.getReu_nome());
-		txtRg.setText(entity.getReu_rg());
-		txtPai.setText(entity.getReu_pai());
-		txtMae.setText(entity.getReu_mae());
-		txtEndereco.setText(entity.getReu_endereco());
-		txtBairro.setText(entity.getReu_bairro());
-		txtTelefone.setText(entity.getReu_telefone());
-		txtCelular.setText(entity.getReu_celular());
+		txtData.setText(String.valueOf(entity.getReu_data()).toString());
+		txtHorario.setText(entity.getReu_horario());
+		txtAtendimento.setText(entity.getReu_atendimento());
+		txtTema.setText(entity.getReu_tema());
+		txtEquipeResponsavel.setText(entity.getReu_equipe_respons());
 		txtObservacoes.setText(entity.getReu_observacoes());
-
-		if (entity.getCidades() == null) {
-			comboBoxCidades.getSelectionModel().selectFirst();
-		} else {
-			comboBoxCidades.setValue(entity.getCidades());
-		}
-
-		if (entity.getGrupos() == null) {
-			comboBoxGrupos.getSelectionModel().selectFirst();
-		} else {
-			comboBoxGrupos.setValue(entity.getGrupos());
-		}
-
-		if (entity.getEquipes() == null) {
-			comboBoxEquipes.getSelectionModel().selectFirst();
-		} else {
-			comboBoxEquipes.setValue(entity.getEquipes());
-		}
-
-		if (entity.getTiposUsuarios() == null) {
-			comboBoxTiposUsuarios.getSelectionModel().selectFirst();
-		} else {
-			comboBoxTiposUsuarios.setValue(entity.getTiposUsuarios());
-		}
-
+		
+		
 	}
 
 	public void loadAssociatedObjects() {
-		if (cidadesService == null) {
-			throw new IllegalStateException("CidadesService was null");
+		/*if (pessoasService == null) {
+			throw new IllegalStateException("PessoasService was null");
 		}
 
-		List<Cidades> list = cidadesService.findAll();
-		obsList = FXCollections.observableArrayList(list);
-		comboBoxCidades.setItems(obsList);
-
-		if (gruposService == null) {
-			throw new IllegalStateException("GruposService was null");
-		}
-
-		List<Grupos> list2 = gruposService.findAll();
-		obsList2 = FXCollections.observableArrayList(list2);
-		comboBoxGrupos.setItems(obsList2);
-
-		if (equipesService == null) {
-			throw new IllegalStateException("EquipesService was null");
-		}
-
-		List<Equipes> list3 = equipesService.findAll();
-		obsList3 = FXCollections.observableArrayList(list3);
-		comboBoxEquipes.setItems(obsList3);
-
-		if (tiposUsuariosService == null) {
-			throw new IllegalStateException("TiposUsuariosService was null");
-		}
-
-		List<TiposUsuarios> list4 = tiposUsuariosService.findAll();
-		obsList4 = FXCollections.observableArrayList(list4);
-		comboBoxTiposUsuarios.setItems(obsList4);
+		List<Pessoas> listP = pessoasService.findAll();
+		obsListP = FXCollections.observableArrayList(listP);
+		comboBoxPessoas.setItems(obsListP);
+*/
+		
 
 	}
 

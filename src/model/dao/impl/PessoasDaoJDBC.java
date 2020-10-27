@@ -169,57 +169,6 @@ public class PessoasDaoJDBC implements PessoasDao {
 	}
 	
 
-
-	@Override
-	public List<Pessoas> findByCidades(Cidades cid) {
-		PreparedStatement st = null;
-		ResultSet rs = null;
-		try {
-			st = conn.prepareStatement(
-					"SELECT pessoas.*, grupos.gru_nome, grupos.gru_id, cidades.cid_nome as CidNom, tipos_usuarios.tuser_nome as TuNom, equipes.equ_nome as EquNom "
-							+ "FROM pessoas "
-							+ "INNER JOIN grupos ON grupos.gru_id = pessoas.id_grupos "
-							+ "INNER JOIN cidades ON cidades.cid_id = pessoas.id_cidades "
-							+ "INNER JOIN tipos_usuarios ON tipos_usuarios.tuser_id = pessoas.id_tipos_usuarios "
-							+ "INNER JOIN equipes ON equipes.equ_id = pessoas.id_equipes "
-							+ "WHERE pessoas.id_cidades = ? "
-							+ "ORDER BY pessoas.pes_nome ");   
-			
-			st.setInt(1, cid.getCid_id());
-			rs = st.executeQuery();
-			
-			List<Pessoas> list = new ArrayList<>();
-			Map<Integer, Cidades> map = new HashMap<Integer, Cidades>();
-			
-			// if para testar se veio algum resultado
-			while (rs.next()) {
-				
-				Cidades cidade = map.get(rs.getInt("id_cidades"));
-				
-				if(cidade == null) {
-					cidade = instantiateCidades(rs);
-					map.put(rs.getInt("id_cidades"), cidade);
-				}
-				
-				
-				Equipes equipe = instantiateEquipes(rs);
-				
-				Grupos grupo = instantiateGrupos(rs);
-				
-				TiposUsuarios tipoUsuario = instantiateTiposUsuarios(rs);
-				
-				Pessoas obj = instantiatePessoas(rs, cidade, equipe, grupo, tipoUsuario);
-				list.add(obj);
-			}
-			return list;
-			
-		} catch (SQLException e) {
-			throw new DbException(e.getMessage());
-		} finally {
-			DB.closeStatement(st);
-			DB.closeResultSet(rs);
-		}
-	}
 	
 	@Override
 	public void insert(Pessoas obj) {
@@ -230,8 +179,6 @@ public class PessoasDaoJDBC implements PessoasDao {
 					+ " (pes_nome, pes_rg, pes_pai, pes_mae, pes_endereco, pes_bairro, pes_telefone, pes_celular, id_cidades, id_grupos, id_equipes, id_tipos_usuarios, pes_observacoes) "
 					+ " VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
 					, Statement.RETURN_GENERATED_KEYS);	
-												
-					
 
 			st.setString(1, obj.getPes_nome());
 			st.setString(2, obj.getPes_rg());
@@ -247,8 +194,6 @@ public class PessoasDaoJDBC implements PessoasDao {
 			st.setInt(12, obj.getTiposUsuarios().getTuser_id());
 			st.setString(13, obj.getPes_observacoes());
 			int rowsAffected = st.executeUpdate();
-			
-			
 			
 			if (rowsAffected > 0) {
 				ResultSet rs = st.getGeneratedKeys();
@@ -314,199 +259,7 @@ public class PessoasDaoJDBC implements PessoasDao {
 		}
 	}
 
-	@Override
-	public List<Pessoas> findByEquipe(Equipes equ) {
-		PreparedStatement st = null;
-		ResultSet rs = null;
-		try {
-			st = conn.prepareStatement(
-					"SELECT pessoas.*, grupos.gru_nome, grupos.gru_id, cidades.cid_nome as CidNom, tipos_usuarios.tuser_nome as TuNom, equipes.equ_nome as EquNom "
-							+ "FROM pessoas "
-							+ "INNER JOIN grupos ON grupos.gru_id = pessoas.id_grupos "
-							+ "INNER JOIN cidades ON cidades.cid_id = pessoas.id_cidades "
-							+ "INNER JOIN tipos_usuarios ON tipos_usuarios.tuser_id = pessoas.id_tipos_usuarios "
-							+ "INNER JOIN equipes ON equipes.equ_id = pessoas.id_equipes "
-							+ "WHERE pessoas.id_equipes = ? "
-							+ "ORDER BY pessoas.pes_nome ");      
-			
-			st.setInt(1, equ.getEqu_id());
-			rs = st.executeQuery();
-			
-			List<Pessoas> list = new ArrayList<>();
-			Map<Integer, Equipes> map = new HashMap<Integer, Equipes>();
-			
-			// if para testar se veio algum resultado
-			while (rs.next()) {
-				
-				Equipes equipe = map.get(rs.getInt("id_equipes"));
-				
-				if(equipe == null) {
-					equipe = instantiateEquipes(rs);
-					map.put(rs.getInt("id_equipes"), equipe);
-				}
-				
-				
-				Cidades cidade = instantiateCidades(rs);
-				
-				Grupos grupo = instantiateGrupos(rs);
-				
-				TiposUsuarios tipoUsuario = instantiateTiposUsuarios(rs);
-				
-				Pessoas obj = instantiatePessoas(rs, cidade, equipe, grupo, tipoUsuario);
-				list.add(obj);
-			}
-			return list;
-			
-		} catch (SQLException e) {
-			throw new DbException(e.getMessage());
-		} finally {
-			DB.closeStatement(st);
-			DB.closeResultSet(rs);
-		}
-}
-
-	@Override
-	public List<Pessoas> findByTiposUsuarios(TiposUsuarios tus) {
-		PreparedStatement st = null;
-		ResultSet rs = null;
-		try {
-			st = conn.prepareStatement(
-			"SELECT pessoas.*, grupos.gru_nome, grupos.gru_id, cidades.cid_nome as CidNom, tipos_usuarios.tuser_nome as TuNom, equipes.equ_nome as EquNom "
-			+ "FROM pessoas "
-			+ "INNER JOIN grupos ON grupos.gru_id = pessoas.id_grupos "
-			+ "INNER JOIN cidades ON cidades.cid_id = pessoas.id_cidades "
-			+ "INNER JOIN tipos_usuarios ON tipos_usuarios.tuser_id = pessoas.id_tipos_usuarios "
-			+ "INNER JOIN equipes ON equipes.equ_id = pessoas.id_equipes "
-			+ "WHERE pessoas.id_tipos_usuarios = ? "
-			+ "ORDER BY pessoas.pes_nome ");   
-			
-			st.setInt(1, tus.getTuser_id());
-			rs = st.executeQuery();
-			
-			List<Pessoas> list = new ArrayList<>();
-			Map<Integer, TiposUsuarios> map = new HashMap<Integer, TiposUsuarios>();
-			
-			// if para testar se veio algum resultado
-			while (rs.next()) {
-				
-				TiposUsuarios tipoUsuario = map.get(rs.getInt("id_tipos_usuarios"));
-				
-				if(tipoUsuario == null) {
-					tipoUsuario = instantiateTiposUsuarios(rs);
-					map.put(rs.getInt("id_tipos_usuarios"), tipoUsuario);
-				}
-				
-				
-				Equipes equipe = instantiateEquipes(rs);
-				
-				Grupos grupo = instantiateGrupos(rs);
-				
-				Cidades cidade = instantiateCidades(rs);
-				
-				Pessoas obj = instantiatePessoas(rs, cidade, equipe, grupo, tipoUsuario);
-				list.add(obj);
-			}
-			return list;
-			
-		} catch (SQLException e) {
-			throw new DbException(e.getMessage());
-		} finally {
-			DB.closeStatement(st);
-			DB.closeResultSet(rs);
-		}
-}
-
-	@Override
-	public List<Pessoas> findByGrupos(Grupos gru) {
-		PreparedStatement st = null;
-		ResultSet rs = null;
-		try {
-			st = conn.prepareStatement(
-			"SELECT pessoas.*, grupos.gru_nome, grupos.gru_id, cidades.cid_nome as CidNom, tipos_usuarios.tuser_nome as TuNom, equipes.equ_nome as EquNom "
-			+ "FROM pessoas "
-			+ "INNER JOIN grupos ON grupos.gru_id = pessoas.id_grupos "
-			+ "INNER JOIN cidades ON cidades.cid_id = pessoas.id_cidades "
-			+ "INNER JOIN tipos_usuarios ON tipos_usuarios.tuser_id = pessoas.id_tipos_usuarios "
-			+ "INNER JOIN equipes ON equipes.equ_id = pessoas.id_equipes "
-			+ "WHERE pessoas.id_grupos = ? "
-			+ "ORDER BY pessoas.pes_nome");   
-			
-			st.setInt(1, gru.getGru_id());
-			rs = st.executeQuery();
-			
-			List<Pessoas> list = new ArrayList<>();
-			Map<Integer, Grupos> map = new HashMap<Integer, Grupos>();
-			
-			// if para testar se veio algum resultado
-			while (rs.next()) {
-				
-				Grupos grupo = map.get(rs.getInt("gru_id"));
-				
-				if(grupo == null) {
-					grupo = instantiateGrupos(rs);
-					map.put(rs.getInt("gru_id"), grupo);
-				}
-				
-				
-				Equipes equipe = instantiateEquipes(rs);
-				
-				Cidades cidade = instantiateCidades(rs);
-				
-				TiposUsuarios tipoUsuario = instantiateTiposUsuarios(rs);
-				
-				Pessoas obj = instantiatePessoas(rs, cidade, equipe, grupo, tipoUsuario);
-				list.add(obj);
-			}
-			return list;
-			
-		} catch (SQLException e) {
-			throw new DbException(e.getMessage());
-		} finally {
-			DB.closeStatement(st);
-			DB.closeResultSet(rs);
-		}
-	}
-
-	@Override
-	public Pessoas findByNome(String nome) {
-		PreparedStatement st = null;
-		ResultSet rs = null;
-		try {
-			st = conn.prepareStatement(
-			"SELECT pessoas.*, grupos.gru_nome, grupos.gru_id, cidades.cid_nome as CidNom, tipos_usuarios.tuser_nome as TuNom, equipes.equ_nome as EquNom "
-			+ "FROM pessoas "
-			+ "INNER JOIN grupos ON grupos.gru_id = pessoas.id_grupos "
-			+ "INNER JOIN cidades ON cidades.cid_id = pessoas.id_cidades "
-			+ "INNER JOIN tipos_usuarios ON tipos_usuarios.tuser_id = pessoas.id_tipos_usuarios "
-			+ "INNER JOIN equipes ON equipes.equ_id = pessoas.id_equipes "
-			+ "WHERE pessoas.pes_nome = ?");
-
-			st.setString(1, nome);
-			rs = st.executeQuery();
-			// if para testar se veio algum resultado
-			if (rs.next()) {
-				Cidades cidade = instantiateCidades(rs);
-				
-				Equipes equipe = instantiateEquipes(rs);
-				
-				Grupos grupo = instantiateGrupos(rs);
-				
-				TiposUsuarios tipoUsuario = instantiateTiposUsuarios(rs);
-				
-				Pessoas obj = instantiatePessoas(rs, cidade, equipe, grupo, tipoUsuario);
-				return obj;
-			}
-			return null;
-			
-		} catch (SQLException e) {
-			throw new DbException(e.getMessage());
-		} finally {
-			DB.closeStatement(st);
-			DB.closeResultSet(rs);
-		}
-
-	}
-	
+		
 	@Override
     public Pessoas recuperar(int codigo) throws Exception {
         String sql = "SELECT * FROM Pessoas WHERE pes_id = ? ";

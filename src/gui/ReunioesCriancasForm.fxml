@@ -1,90 +1,75 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.Group?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ComboBox?>
-<?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.control.TableColumn?>
-<?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.RowConstraints?>
-<?import javafx.scene.layout.VBox?>
-<?import javafx.scene.text.Font?>
 
-<VBox prefHeight="544.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.ReunioesCriancasFormController">
+<AnchorPane prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.ReunioesCriancasFormController">
    <children>
-      <Label text="Cadastro de Reuniões de Crianças">
-         <font>
-            <Font name="System Bold" size="14.0" />
-         </font>
-         <padding>
-            <Insets left="5.0" top="5.0" />
-         </padding>
-         <VBox.margin>
-            <Insets bottom="20.0" top="5.0" />
-         </VBox.margin>
-      </Label>
-      <AnchorPane fx:id="btConfirmar" prefHeight="536.0" prefWidth="800.0">
+      <GridPane layoutX="15.0" layoutY="20.0" prefHeight="574.0" prefWidth="770.0" AnchorPane.bottomAnchor="6.0" AnchorPane.leftAnchor="15.0" AnchorPane.rightAnchor="15.0" AnchorPane.topAnchor="20.0">
+        <columnConstraints>
+          <ColumnConstraints hgrow="SOMETIMES" maxWidth="186.0" minWidth="1.0" prefWidth="118.0" />
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="519.0" minWidth="10.0" prefWidth="492.0" />
+          <ColumnConstraints hgrow="SOMETIMES" maxWidth="267.0" minWidth="10.0" prefWidth="150.0" />
+        </columnConstraints>
+        <rowConstraints>
+          <RowConstraints maxHeight="53.0" minHeight="8.0" prefHeight="31.0" vgrow="SOMETIMES" />
+          <RowConstraints maxHeight="82.0" minHeight="3.0" prefHeight="32.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="213.0" minHeight="5.0" prefHeight="33.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="247.0" minHeight="10.0" prefHeight="35.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="280.0" minHeight="10.0" prefHeight="33.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="301.0" minHeight="10.0" prefHeight="33.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="282.0" minHeight="10.0" prefHeight="56.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="288.0" minHeight="10.0" prefHeight="43.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="264.0" minHeight="0.0" prefHeight="187.0" vgrow="SOMETIMES" />
+          <RowConstraints maxHeight="211.0" minHeight="5.0" prefHeight="84.0" vgrow="SOMETIMES" />
+        </rowConstraints>
          <children>
-            <GridPane prefHeight="428.0" prefWidth="634.0" AnchorPane.leftAnchor="80.0" AnchorPane.topAnchor="10.0">
-              <columnConstraints>
-                <ColumnConstraints hgrow="SOMETIMES" maxWidth="333.0" minWidth="10.0" prefWidth="106.0" />
-                <ColumnConstraints hgrow="SOMETIMES" maxWidth="559.0" minWidth="10.0" prefWidth="528.0" />
-              </columnConstraints>
-              <rowConstraints>
-                <RowConstraints maxHeight="32.0" minHeight="1.0" prefHeight="14.0" vgrow="SOMETIMES" />
-                <RowConstraints maxHeight="70.0" minHeight="10.0" prefHeight="16.0" vgrow="SOMETIMES" />
-                  <RowConstraints maxHeight="97.0" minHeight="10.0" prefHeight="24.0" vgrow="SOMETIMES" />
-                <RowConstraints maxHeight="114.0" minHeight="10.0" prefHeight="19.0" vgrow="SOMETIMES" />
-                  <RowConstraints maxHeight="138.0" minHeight="10.0" prefHeight="25.0" vgrow="SOMETIMES" />
-                  <RowConstraints maxHeight="162.0" minHeight="10.0" prefHeight="26.0" vgrow="SOMETIMES" />
-                  <RowConstraints maxHeight="176.0" minHeight="10.0" prefHeight="38.0" vgrow="SOMETIMES" />
-                  <RowConstraints maxHeight="181.0" minHeight="10.0" prefHeight="31.0" vgrow="SOMETIMES" />
-                  <RowConstraints maxHeight="193.0" minHeight="10.0" prefHeight="193.0" vgrow="SOMETIMES" />
-              </rowConstraints>
+            <Label text="Código(Id)" />
+            <Label text="Data:" GridPane.rowIndex="1" />
+            <TextField fx:id="txtId" editable="false" prefHeight="29.0" prefWidth="257.0" GridPane.columnIndex="1" />
+            <TextField fx:id="txtData" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+            <ComboBox fx:id="comboBoxPessoas" prefHeight="25.0" prefWidth="388.0" GridPane.columnIndex="1" GridPane.rowIndex="7" />
+            <Label fx:id="labelErrorNome" textFill="RED" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+            <HBox prefHeight="28.0" prefWidth="381.0" spacing="5.0" GridPane.columnIndex="1" GridPane.rowIndex="9">
                <children>
-                  <Label text="Código (Id):" />
-                  <Label text="Data:" GridPane.rowIndex="1" />
-                  <Label text="Horario:" GridPane.rowIndex="2" />
-                  <Label text="Atendimento:" GridPane.rowIndex="3" />
-                  <Label text="Tema:" GridPane.rowIndex="4" />
-                  <Label text="Equipe resp.:" GridPane.rowIndex="5" />
-                  <Label text="Observações:" wrapText="true" GridPane.rowIndex="6" />
-                  <TextArea fx:id="txtAreaObservacoes" prefHeight="43.0" prefWidth="519.0" GridPane.columnIndex="1" GridPane.rowIndex="6" />
-                  <TextField fx:id="txtFieldHorario" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-                  <TextField fx:id="txtFieldAtendimento" prefHeight="25.0" prefWidth="440.0" GridPane.columnIndex="1" GridPane.rowIndex="3" />
-                  <TextField fx:id="txtFieldTema" GridPane.columnIndex="1" GridPane.rowIndex="4" />
-                  <TextField fx:id="txtFieldEquipeResponsavel" GridPane.columnIndex="1" GridPane.rowIndex="5" />
-                  <Label text="Participantes:" GridPane.rowIndex="7" />
-                  <Button mnemonicParsing="false" text="Adicionar" GridPane.columnIndex="1" GridPane.rowIndex="7">
-                     <GridPane.margin>
-                        <Insets left="400.0" />
-                     </GridPane.margin>
-                  </Button>
-                  <ComboBox fx:id="comboBoxParticipantes" prefHeight="25.0" prefWidth="389.0" promptText="Selecione o participante para adicionar..." GridPane.columnIndex="1" GridPane.rowIndex="7" />
-                  <TableView fx:id="tableViewReuniaoParticipantes" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="8">
-                    <columns>
-                      <TableColumn fx:id="tableColumnReunioesData" prefWidth="75.0" text="Data" />
-                      <TableColumn fx:id="tableColumnReunioesParticipantes" prefWidth="452.0" text="Participantes" />
-                    </columns>
-                  </TableView>
-                  <ComboBox fx:id="comboBoxData" prefHeight="25.0" prefWidth="237.0" promptText="Selecione a data da reunião..." GridPane.columnIndex="1" />
-                  <DatePicker fx:id="datePicker" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                  <Button fx:id="btSalvar" mnemonicParsing="false" onAction="#onBtSalvarAction" text="Salvar" />
+                  <Button fx:id="btCancelar" mnemonicParsing="false" onAction="#onBtCancelarAction" text="Cancelar" />
                </children>
-            </GridPane>
-            <Group layoutX="562.625" layoutY="255.0" AnchorPane.bottomAnchor="20.0" AnchorPane.rightAnchor="89.046875">
-               <children>
-                  <Button fx:id="btSalvar" mnemonicParsing="false" onAction="#onBtSalvarAction" prefHeight="25.0" prefWidth="78.0" text="Salvar" />
-                  <Button fx:id="btCancelar" layoutX="87.0" mnemonicParsing="false" onAction="#onBtCancelarAction" text="Cancelar" />
-               </children>
-            </Group>
+               <padding>
+                  <Insets left="5.0" top="5.0" />
+               </padding>
+            </HBox>
+            <Label text="Horário:" GridPane.rowIndex="2" />
+            <BorderPane prefHeight="200.0" prefWidth="200.0" />
+            <Label text="Atendimento:" GridPane.rowIndex="3" />
+            <Label text="Tema:" GridPane.rowIndex="4" />
+            <Label text="Equipe Resp.:" GridPane.rowIndex="5" />
+            <Label text="Participante (Pessoas):" GridPane.rowIndex="7" />
+            <Label text="Observações:" GridPane.rowIndex="6" />
+            <TextField fx:id="txtHorario" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+            <TextField fx:id="txtAtendimento" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+            <TextField fx:id="txtTema" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+            <TextField fx:id="txtEquipeResponsavel" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+            <TextArea fx:id="txtObservacoes" prefHeight="76.0" prefWidth="376.0" GridPane.columnIndex="1" GridPane.rowIndex="6" />
+            <Button fx:id="btAdicionar" mnemonicParsing="false" text="Button" GridPane.columnIndex="1" GridPane.rowIndex="7">
+               <GridPane.margin>
+                  <Insets left="400.0" />
+               </GridPane.margin>
+            </Button>
          </children>
-      </AnchorPane>
+      </GridPane>
    </children>
-</VBox>
+   <opaqueInsets>
+      <Insets top="10.0" />
+   </opaqueInsets>
+</AnchorPane>
