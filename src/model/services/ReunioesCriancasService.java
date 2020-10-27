@@ -4,6 +4,7 @@ import java.util.List;
 
 import model.dao.ReunioesCriancasDao;
 import model.dao.DaoFactory;
+import model.entities.Pessoas;
 import model.entities.ReunioesCriancas;
 
 public class ReunioesCriancasService {
@@ -25,9 +26,5 @@ public class ReunioesCriancasService {
 	public void remove(ReunioesCriancas obj) {
 		dao.deleteById(obj.getReu_id());
 	}
-	
-	
-	
-	
-	
+
 }

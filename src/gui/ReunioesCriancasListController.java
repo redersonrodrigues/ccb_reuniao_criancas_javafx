@@ -2,8 +2,7 @@ package gui;
 
 import java.io.IOException;
 import java.net.URL;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
@@ -13,8 +12,6 @@ import db.DbIntegrityException;
 import gui.listeners.DataChangeListener;
 import gui.util.Alerts;
 import gui.util.Utils;
-import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -28,19 +25,18 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableColumn.CellDataFeatures;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.Pane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import javafx.util.Callback;
 import model.entities.ReunioesCriancas;
 import model.services.CidadesService;
 import model.services.EquipesService;
 import model.services.GruposService;
 import model.services.ReunioesCriancasService;
+import model.services.TiposUsuariosService;
 
 public class ReunioesCriancasListController implements Initializable, DataChangeListener {
 
@@ -60,16 +56,28 @@ public class ReunioesCriancasListController implements Initializable, DataChange
 	private TableView<ReunioesCriancas> tableViewReunioesCriancas;
 
 	@FXML
-	private TableColumn<ReunioesCriancas, String> tableColumnReuniaoData;
+	private TableColumn<ReunioesCriancas, String> tableColumnPessoaTelefone;
 
 	@FXML
-	private TableColumn<ReunioesCriancas, String> tableColumnReuniaoEquipeResponsavel;
+	private TableColumn<ReunioesCriancas, String> tableColumnPessoaNome;
+
+	@FXML
+	private TableColumn<ReunioesCriancas, ReunioesCriancas> tableColumnReuniaoId;
+
+	@FXML
+	private TableColumn<ReunioesCriancas, ReunioesCriancas> tableColumnReuniaoData;
+	
+	@FXML
+	private TableColumn<ReunioesCriancas, ReunioesCriancas> tableColumnReuniaoParticipante;
 
 	@FXML
 	private Label lblReuniaoId;
 
 	@FXML
 	private Label lblReuniaoData;
+
+	@FXML
+	private Label lblReuniaoHorario;
 
 	@FXML
 	private Label lblReuniaoAtendimento;
@@ -81,12 +89,9 @@ public class ReunioesCriancasListController implements Initializable, DataChange
 	private Label lblReuniaoEquipeResponsavel;
 
 	@FXML
-	private Label lblReuniaoObservacoes;
+	private TextArea txtAreaReuniaoObservacoes;
 
-	@FXML
-	private TextArea txtPessoas;
-	
-	List<ReunioesCriancas> list;
+	List<ReunioesCriancas> listaReuniao;
 
 	private ObservableList<ReunioesCriancas> obsList;
 
@@ -165,20 +170,12 @@ public class ReunioesCriancasListController implements Initializable, DataChange
 	}
 
 	private void InitializeNodes() {
-		// Metodo para formatar data padrao brasileiro na tableView
-		SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
-		tableColumnReuniaoData.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<ReunioesCriancas,String>, ObservableValue<String>>() {
-		public ObservableValue<String> call(CellDataFeatures<ReunioesCriancas, String> cell) {
-            final ReunioesCriancas record = cell.getValue();
 
-            final SimpleObjectProperty<String> simpleObject = new SimpleObjectProperty<String>(sdf.format(record.getReu_data()));
-        return simpleObject;
-        }
-		});	
-		//tableColumnReuniaoData.setCellValueFactory(new PropertyValueFactory<>(sdf.format("reu_data")));
-
-		tableColumnReuniaoEquipeResponsavel.setCellValueFactory(new PropertyValueFactory<>("reu_equipe_respons"));
-
+		
+		tableColumnReuniaoId.setCellValueFactory(new PropertyValueFactory<>("reu_id"));
+		tableColumnReuniaoData.setCellValueFactory(new PropertyValueFactory<>("reu_data"));
+		tableColumnReuniaoParticipante.setCellValueFactory(new PropertyValueFactory<>("pessoa"));
+		
 		// para a tabela acompanhar altura e largura da tela
 		Stage stage = (Stage) Main.getMainScene().getWindow();
 		tableViewReunioesCriancas.prefHeightProperty().bind(stage.heightProperty());
@@ -205,17 +202,18 @@ public class ReunioesCriancasListController implements Initializable, DataChange
 			// passos para carregar dados
 			ReunioesCriancasFormController controller = loader.getController();
 			controller.setReunioesCriancas(obj);
-			controller.setReunioesCriancasServices(new ReunioesCriancasService());// injeção de dependencia ReunioesCriancasServices para
+			controller.setReunioesCriancasServices(new ReunioesCriancasService(), new CidadesService(), new GruposService(),
+					new EquipesService(), new TiposUsuariosService());// injeção de dependencia ReunioesCriancasServices para
 																		// carregamento
 
 			controller.loadAssociatedObjects(); // carrega estados do banco de dados e deixa no controller
 
-				controller.subscribeDataChangeListener(this);// se inscrevendo para observar listeners (onDataChanged)
+			controller.subscribeDataChangeListener(this);// se inscrevendo para observar listeners (onDataChanged)
 			controller.updateFormData();
 
 			// passos para abrir um formulario modal a partir de outro de referência
 			Stage dialogStage = new Stage();
-			dialogStage.setTitle("Entre com os dados da Reunião: ");
+			dialogStage.setTitle("Entre com os dados da reuniao: ");
 			dialogStage.setScene(new Scene(pane));
 			dialogStage.setResizable(false);
 			dialogStage.initOwner(parenteStage);
@@ -238,23 +236,22 @@ public class ReunioesCriancasListController implements Initializable, DataChange
 	public void selecionarItemTableViewReunioesCriancas(ReunioesCriancas reuniao) {
 		if (reuniao != null) {
 			lblReuniaoId.setText(String.valueOf(reuniao.getReu_id()));
-			SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy");
-			lblReuniaoData.setText(df.format(reuniao.getReu_data()));
+			lblReuniaoData.setText(String.valueOf(reuniao.getReu_data().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))));
+			lblReuniaoHorario.setText(reuniao.getReu_horario());
 			lblReuniaoAtendimento.setText(reuniao.getReu_atendimento());
 			lblReuniaoTema.setText(reuniao.getReu_tema());
 			lblReuniaoEquipeResponsavel.setText(reuniao.getReu_equipe_respons());
-			lblReuniaoObservacoes.setText(reuniao.getReu_observacoes());
-
+			txtAreaReuniaoObservacoes.setText(reuniao.getReu_observacoes());
 			
 		} else {
 			lblReuniaoId.setText("");
 			lblReuniaoData.setText("");
+			lblReuniaoHorario.setText("");
 			lblReuniaoAtendimento.setText("");
 			lblReuniaoTema.setText("");
 			lblReuniaoEquipeResponsavel.setText("");
-			lblReuniaoObservacoes.setText("");			txtPessoas.setText("");
-
-		}
+			txtAreaReuniaoObservacoes.setText("");
+				}
 	}
 
 }

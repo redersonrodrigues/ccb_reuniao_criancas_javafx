@@ -25,6 +25,11 @@ public class PessoasService {
 	public void remove(Pessoas obj) {
 		dao.deleteById(obj.getPes_id());
 	}
+
+	public Pessoas recuperar(int codigo) throws Exception  {
+		// TODO Auto-generated method stub
+		return dao.recuperar(codigo);
+	}
 	
 	
 	

@@ -44,14 +44,12 @@ public class MainViewController implements Initializable {
 
 	@FXML
 	public void onMenuItemReunioesAction() {
-		//System.out.println("onMenuItemReunioesAction");
-		loadView("/gui/ReunioesCriancasList.fxml", (ReunioesCriancasListController controller) ->{
+		loadView("/gui/ReunioesCriancasList.fxml", (ReunioesCriancasListController controller) -> {
 			controller.setReunioesCriancasService(new ReunioesCriancasService());
 			controller.updateTableView();
-			
 		});
 	}
-
+		
 	@FXML
 	public void onMenuItemPessoasAction() {
 		//System.out.println("onMenuItemPessoasAction");

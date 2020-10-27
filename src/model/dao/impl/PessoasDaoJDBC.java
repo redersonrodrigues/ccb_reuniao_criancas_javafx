@@ -1,9 +1,5 @@
 package model.dao.impl;
 
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -14,12 +10,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.imageio.ImageIO;
-
 import db.DB;
 import db.DbException;
 import db.DbIntegrityException;
-import javafx.scene.image.Image;
 import model.dao.PessoasDao;
 import model.entities.Cidades;
 import model.entities.Equipes;
@@ -513,4 +506,49 @@ public class PessoasDaoJDBC implements PessoasDao {
 		}
 
 	}
+	
+	@Override
+    public Pessoas recuperar(int codigo) throws Exception {
+        String sql = "SELECT * FROM Pessoas WHERE pes_id = ? ";
+        PreparedStatement ps = conn.prepareStatement(sql);
+        ps.setInt(1, codigo);
+        ResultSet rs = ps.executeQuery();
+
+        Pessoas pessoa = new Pessoas();
+        if (rs.next()) {
+        	Equipes equipe = instantiateEquipes(rs);
+			
+			Cidades cidade = instantiateCidades(rs);
+			
+			Grupos grupo = instantiateGrupos(rs);
+			
+			TiposUsuarios tipoUsuario = instantiateTiposUsuarios(rs);
+			
+			Pessoas obj = instantiatePessoas(rs, cidade, equipe, grupo, tipoUsuario);
+        }
+
+        return pessoa;
+    }
+
+	@Override
+	 public Pessoas buscar(Pessoas pessoa) {
+        String sql = "SELECT * FROM pessoas WHERE pes_id=?";
+        Pessoas retorno = new Pessoas();
+        
+        try {
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            stmt.setInt(1, pessoa.getPes_id());
+            ResultSet resultado = stmt.executeQuery();
+            if (resultado.next()) {
+                pessoa.setPes_nome(resultado.getString("pes_nome"));
+                pessoa.setPes_pai(resultado.getString("pes_pai"));
+                pessoa.setPes_telefone(resultado.getString("pes_telefone"));
+                retorno = pessoa;
+            }
+        } catch (SQLException ex) {
+        	throw new DbException(ex.getMessage()); 
+        }
+        return retorno;
+	}
+	
 }

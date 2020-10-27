@@ -43,6 +43,13 @@ public class Pessoas implements Serializable{
 		this.grupos = grupos;
 		this.tiposUsuarios = tiposUsuarios;
 	}
+	
+	
+
+	public Pessoas(String pes_nome) {
+		super();
+		this.pes_nome = pes_nome;
+	}
 
 	public Integer getPes_id() {
 		return pes_id;
@@ -180,14 +187,12 @@ public class Pessoas implements Serializable{
 			return false;
 		return true;
 	}
+	
+	
 
 	@Override
 	public String toString() {
-		return "Pessoas [pes_id=" + pes_id + ", pes_nome=" + pes_nome + ", pes_rg=" + pes_rg + ", pes_pai=" + pes_pai
-				+ ", pes_mae=" + pes_mae + ", pes_endereco=" + pes_endereco + ", pes_bairro=" + pes_bairro
-				+ ", pes_telefone=" + pes_telefone + ", pes_celular=" + pes_celular + ", pes_observacoes="
-				+ pes_observacoes + ", cidades=" + cidades + ", equipes=" + equipes + ", grupos=" + grupos
-				+ ", tiposUsuarios=" + tiposUsuarios + "]";
+		return  pes_nome;
 	}
 
 	

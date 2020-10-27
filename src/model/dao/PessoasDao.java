@@ -15,10 +15,12 @@ public interface PessoasDao {
 	void deleteById(Integer id);
 	Pessoas findById(Integer id);
 	Pessoas findByNome(String nome);
+	Pessoas buscar(Pessoas pessoa);
 	List<Pessoas> findAll();
 	List<Pessoas> findByEquipe(Equipes equipes);
 	List<Pessoas> findByTiposUsuarios(TiposUsuarios tiposUsuarios);
 	List<Pessoas> findByCidades(Cidades cidades);
 	List<Pessoas> findByGrupos(Grupos grupos);
+	Pessoas recuperar(int codigo) throws Exception;
 	
 }
