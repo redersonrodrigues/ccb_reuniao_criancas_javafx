@@ -3,6 +3,7 @@ package gui;
 import java.net.URL;
 import java.sql.Date;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -156,17 +157,18 @@ public class ReunioesCriancasFormController implements Initializable {
 
 		obj.setReu_id(Utils.tryParseToInt(txtId.getText()));
 
-		if (dpDataReuniao.getValue() == null || dpDataReuniao.getValue().equals("")) {
-
-			exception.addError("nome", "O campo não pode ser vazio!");
-
+		if (dpDataReuniao.getValue() == null) {
+			exception.addError("Data Reunião", "Field não pode estar em branco(empty)");
+		} else {
+			Instant instant = Instant.from(dpDataReuniao.getValue().atStartOfDay(ZoneId.systemDefault()));
+			obj.setReu_data(Date.from(instant));
 		}
-
 		obj.setReu_horario(txtHorario.getText());
 		obj.setReu_atendimento(txtAtendimento.getText());
 		obj.setReu_tema(txtTema.getText());
 		obj.setReu_equipe_respons(txtEquipeResponsavel.getText());
 		obj.setReu_observacoes(txtObservacoes.getText());
+		obj.setPessoa(comboBoxPessoas.getValue());
 		
 		if (exception.getErrors().size() > 0) {
 			throw exception;
@@ -223,6 +225,12 @@ public class ReunioesCriancasFormController implements Initializable {
 
 		txtId.setText(String.valueOf(entity.getReu_id()));
 		 
+		/*if (entity.getReu_data() != null) {
+			dpDataReuniao.setValue(LocalDate.ofInstant(entity.getReu_data().toInstant(), ZoneId.systemDefault()));
+		}
+		*/
+		
+		
 		if (entity.getReu_data() != null) {
 			dpDataReuniao.setValue(LocalDate.parse(entity.getReu_data().toString()));
 		}

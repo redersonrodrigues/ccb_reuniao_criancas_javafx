@@ -113,20 +113,22 @@ public class ReunioesCriancasDaoJDBC implements ReunioesCriancasDao {
 		try {
 			st = conn.prepareStatement(
 				"INSERT INTO reunioes " +
-				"(reu_data, reu_horario, reu_atendimento, reu_tema, reu_equipe_respons, reu_observacoes, idPessoa) " +
+				"(reu_data, reu_horario, reu_atendimento, reu_tema, reu_equipe_responsavel, reu_observacoes, idPessoas) " +
 				"VALUES " +
 				"(?,?,?,?,?,?,?)", 
 				Statement.RETURN_GENERATED_KEYS);
 
-			st.setDate(1,Date.valueOf(obj.getReu_data().toString()));
-			st.setString(1, obj.getReu_horario());
+			st.setDate(1,new java.sql.Date(obj.getReu_data().getTime()));
+			st.setString(2, obj.getReu_horario());
 			st.setString(3, obj.getReu_atendimento());
 			st.setString(4, obj.getReu_tema());
 			st.setString(5, obj.getReu_equipe_respons());
 			st.setString(6, obj.getReu_observacoes());
 			st.setInt(7, obj.getPessoa().getPes_id());
-
+			
 			int rowsAffected = st.executeUpdate();
+
+			System.out.println(rowsAffected);
 			
 			if (rowsAffected > 0) {
 				ResultSet rs = st.getGeneratedKeys();
@@ -153,11 +155,17 @@ public class ReunioesCriancasDaoJDBC implements ReunioesCriancasDao {
 		try {
 			st = conn.prepareStatement(
 				"UPDATE reunioes " +
-				"SET reu_data = ?, reu_atendimento = ?, reu_tema = ?, reu_equipe_respons = ?, reu_observacoes = ?, idPessoa = ? " +
+				"SET reu_data = ?, reu_horario = ?, reu_atendimento = ?, reu_tema = ?, reu_equipe_responsavel = ?, reu_observacoes = ?, idPessoas = ? " +
 				"WHERE reu_id = ?");
 
-			st.setDate(1, Date.valueOf(obj.getReu_data().toString()));
-			st.setInt(2, obj.getReu_id());
+			st.setDate(1, new java.sql.Date(obj.getReu_data().getTime()));
+			st.setString(2, obj.getReu_horario());
+			st.setString(3, obj.getReu_atendimento());
+			st.setString(4, obj.getReu_tema());
+			st.setString(5, obj.getReu_equipe_respons());
+			st.setString(6, obj.getReu_observacoes());
+			st.setInt(7, obj.getPessoa().getPes_id());
+			st.setInt(8, obj.getReu_id());
 
 			st.executeUpdate();
 		}
