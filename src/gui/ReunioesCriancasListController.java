@@ -3,10 +3,18 @@ package gui;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.Date;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.chrono.ChronoLocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
+
+import javax.swing.text.DateFormatter;
+
+import com.mysql.jdbc.Util;
 
 import application.Main;
 import db.DbIntegrityException;
@@ -33,6 +41,7 @@ import javafx.scene.layout.Pane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import model.entities.ReunioesCriancas;
+import model.services.PessoasService;
 import model.services.ReunioesCriancasService;
 
 public class ReunioesCriancasListController implements Initializable, DataChangeListener {
@@ -101,6 +110,7 @@ public class ReunioesCriancasListController implements Initializable, DataChange
 	public void onBtAlterarAction(ActionEvent event) {
 
 		ReunioesCriancas reuniao = tableViewReunioesCriancas.getSelectionModel().getSelectedItem();
+		
 		if (reuniao != null) {
 			// acessa o Stage da tela referência
 			Stage parentStage = Utils.currentStage(event);
@@ -193,9 +203,9 @@ public class ReunioesCriancasListController implements Initializable, DataChange
 			// passos para carregar dados
 			ReunioesCriancasFormController controller = loader.getController();
 			controller.setReunioesCriancas(obj);
-			controller.setReunioesCriancasServices(new ReunioesCriancasService());// injeção de dependencia ReunioesCriancasServices para carregamento
+			controller.setServices(new ReunioesCriancasService(), new PessoasService());// injeção de dependencia ReunioesCriancasServices para carregamento
 
-			controller.loadAssociatedObjects(); // carrega reunioes do banco de dados e deixa no controller
+			controller.loadAssociatedObjects(); // carrega Pessoas do banco de dados e deixa no controller
 
 			controller.subscribeDataChangeListener(this);// se inscrevendo para observar listeners (onDataChanged)
 			controller.updateFormData();
@@ -225,7 +235,9 @@ public class ReunioesCriancasListController implements Initializable, DataChange
 	public void selecionarItemTableViewReunioesCriancas(ReunioesCriancas reuniao) {
 		if (reuniao != null) {
 			lblReuniaoId.setText(String.valueOf(reuniao.getReu_id()));
-			lblReuniaoData.setText(String.valueOf(reuniao.getReu_data().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))));
+			
+			lblReuniaoData.setText(new SimpleDateFormat("dd/MM/yyyy").format(reuniao.getReu_data()));
+			
 			lblReuniaoHorario.setText(reuniao.getReu_horario());
 			lblReuniaoAtendimento.setText(reuniao.getReu_atendimento());
 			lblReuniaoTema.setText(reuniao.getReu_tema());

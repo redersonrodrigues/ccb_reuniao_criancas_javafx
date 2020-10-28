@@ -39,7 +39,7 @@ public class ReunioesCriancasDaoJDBC implements ReunioesCriancasDao {
 				ReunioesCriancas obj = new ReunioesCriancas();
 				Pessoas pessoa = new Pessoas();
 				obj.setReu_id(rs.getInt("reu_id"));
-				obj.setReu_data(rs.getDate("reu_data").toLocalDate());
+				obj.setReu_data(rs.getDate("reu_data"));
 				obj.setReu_atendimento(rs.getString("reu_atendimento"));
 				obj.setReu_tema(rs.getString("reu_tema"));
 				obj.setReu_equipe_respons(rs.getString("equipe_respons"));
@@ -79,7 +79,7 @@ public class ReunioesCriancasDaoJDBC implements ReunioesCriancasDao {
 	                
 
 	                reuniao.setReu_id(rs.getInt("reu_id"));
-	                reuniao.setReu_data(rs.getDate("reu_data").toLocalDate());
+	                reuniao.setReu_data(rs.getDate("reu_data"));
 	                reuniao.setReu_horario(rs.getString("reu_horario"));
 	                reuniao.setReu_atendimento(rs.getString("reu_atendimento"));
 	                reuniao.setReu_tema(rs.getString("reu_tema"));
@@ -118,7 +118,7 @@ public class ReunioesCriancasDaoJDBC implements ReunioesCriancasDao {
 				"(?,?,?,?,?,?,?)", 
 				Statement.RETURN_GENERATED_KEYS);
 
-			st.setDate(1,Date.valueOf(obj.getReu_data()));
+			st.setDate(1,Date.valueOf(obj.getReu_data().toString()));
 			st.setString(1, obj.getReu_horario());
 			st.setString(3, obj.getReu_atendimento());
 			st.setString(4, obj.getReu_tema());
@@ -156,7 +156,7 @@ public class ReunioesCriancasDaoJDBC implements ReunioesCriancasDao {
 				"SET reu_data = ?, reu_atendimento = ?, reu_tema = ?, reu_equipe_respons = ?, reu_observacoes = ?, idPessoa = ? " +
 				"WHERE reu_id = ?");
 
-			st.setDate(1, Date.valueOf(obj.getReu_data()));
+			st.setDate(1, Date.valueOf(obj.getReu_data().toString()));
 			st.setInt(2, obj.getReu_id());
 
 			st.executeUpdate();

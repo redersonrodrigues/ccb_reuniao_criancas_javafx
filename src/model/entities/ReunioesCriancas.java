@@ -9,7 +9,7 @@ public class ReunioesCriancas implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	private Integer reu_id;
-	private LocalDate reu_data;
+	private Date reu_data;
 	private String reu_horario;
 	private String reu_atendimento;
 	private String reu_tema;
@@ -20,7 +20,7 @@ public class ReunioesCriancas implements Serializable {
 	
 	public ReunioesCriancas() {}
 
-	public ReunioesCriancas(Integer reu_id, LocalDate reu_data, String reu_horario, String reu_atendimento, String reu_tema,
+	public ReunioesCriancas(Integer reu_id, Date reu_data, String reu_horario, String reu_atendimento, String reu_tema,
 			String reu_equipe_respons, String reu_observacoes, Pessoas pessoa) {
 		this.reu_id = reu_id;
 		this.reu_data = reu_data;
@@ -40,11 +40,11 @@ public class ReunioesCriancas implements Serializable {
 		this.reu_id = reu_id;
 	}
 
-	public LocalDate getReu_data() {
+	public Date getReu_data() {
 		return reu_data;
 	}
 
-	public void setReu_data(LocalDate reu_data) {
+	public void setReu_data(Date reu_data) {
 		this.reu_data = reu_data;
 	}
 

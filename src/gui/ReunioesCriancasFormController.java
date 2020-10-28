@@ -2,8 +2,13 @@ package gui;
 
 import java.net.URL;
 import java.sql.Date;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
@@ -13,12 +18,15 @@ import gui.listeners.DataChangeListener;
 import gui.util.Alerts;
 import gui.util.Constraints;
 import gui.util.Utils;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
@@ -29,16 +37,17 @@ import javafx.util.Callback;
 import model.entities.Pessoas;
 import model.entities.ReunioesCriancas;
 import model.exceptions.ValidationException;
+import model.services.PessoasService;
 import model.services.ReunioesCriancasService;
 
 public class ReunioesCriancasFormController implements Initializable {
 
 	// injeção de dependencia para a entidade relacionada a este formulário
 	private ReunioesCriancas entity;
-
+	
 	// injeção dependência ReunioesCriancasService
 	private ReunioesCriancasService service;
-
+	private PessoasService pessoasService;
 	
 	private List<DataChangeListener> dataChangeListeners = new ArrayList<>();
 
@@ -46,7 +55,7 @@ public class ReunioesCriancasFormController implements Initializable {
 	private TextField txtId;
 
 	@FXML
-	private TextField txtData;
+	private DatePicker dpDataReuniao;
 
 	@FXML
 	private TextField txtHorario;
@@ -84,16 +93,22 @@ public class ReunioesCriancasFormController implements Initializable {
 	
 	@FXML
 	private Button btAdicionar;
+	
+		
+	private ObservableList<Pessoas> obsListP;
+	
 
 	
 	public void setReunioesCriancas(ReunioesCriancas entity) {
 		this.entity = entity;
 	}
 
-	public void setReunioesCriancasServices(ReunioesCriancasService service) {
+	public void setServices(ReunioesCriancasService service, PessoasService pessoasService) {
 		this.service = service;
+		this.pessoasService = pessoasService;
 		
 	}
+
 
 	// metodo para se inscrever na lista
 	public void subscribeDataChangeListener(DataChangeListener listener) {
@@ -110,7 +125,7 @@ public class ReunioesCriancasFormController implements Initializable {
 		}
 
 		try {
-			// System.out.println("onBtSalvarAction");
+			
 			entity = getFormData();
 			service.saveOrUpdate(entity);
 			notifyDataChangeListeners();
@@ -141,13 +156,12 @@ public class ReunioesCriancasFormController implements Initializable {
 
 		obj.setReu_id(Utils.tryParseToInt(txtId.getText()));
 
-		if (txtData.getText() == null || txtData.getText().trim().equals("")) {
+		if (dpDataReuniao.getValue() == null || dpDataReuniao.getValue().equals("")) {
 
 			exception.addError("nome", "O campo não pode ser vazio!");
 
 		}
 
-		obj.setReu_data(Date.valueOf(txtData.getText()).toLocalDate());
 		obj.setReu_horario(txtHorario.getText());
 		obj.setReu_atendimento(txtAtendimento.getText());
 		obj.setReu_tema(txtTema.getText());
@@ -179,7 +193,7 @@ public class ReunioesCriancasFormController implements Initializable {
 	// função para tratamento de restrições (constraints)
 	public void initializeNodes() {
 		Constraints.setTextFieldInteger(txtId);
-		Constraints.setTextFieldMaxLength(txtData, 20);
+		Utils.formatDatePicker(dpDataReuniao, "dd/MM/yyyy");		
 		Constraints.setTextFieldMaxLength(txtHorario, 20);
 		Constraints.setTextFieldMaxLength(txtAtendimento, 255);
 		Constraints.setTextFieldMaxLength(txtTema, 255);
@@ -208,25 +222,30 @@ public class ReunioesCriancasFormController implements Initializable {
 		}
 
 		txtId.setText(String.valueOf(entity.getReu_id()));
-		txtData.setText(String.valueOf(entity.getReu_data()).toString());
+		 
+		if (entity.getReu_data() != null) {
+			dpDataReuniao.setValue(LocalDate.parse(entity.getReu_data().toString()));
+		}
 		txtHorario.setText(entity.getReu_horario());
 		txtAtendimento.setText(entity.getReu_atendimento());
 		txtTema.setText(entity.getReu_tema());
 		txtEquipeResponsavel.setText(entity.getReu_equipe_respons());
 		txtObservacoes.setText(entity.getReu_observacoes());
-		
-		
+		if (entity.getPessoa() == null) {
+			comboBoxPessoas.getSelectionModel().selectFirst();
+		} else {
+		comboBoxPessoas.setValue(entity.getPessoa());
+		}
 	}
 
 	public void loadAssociatedObjects() {
-		/*if (pessoasService == null) {
+		if (pessoasService == null) {
 			throw new IllegalStateException("PessoasService was null");
 		}
 
 		List<Pessoas> listP = pessoasService.findAll();
 		obsListP = FXCollections.observableArrayList(listP);
 		comboBoxPessoas.setItems(obsListP);
-*/
 		
 
 	}
