@@ -2,14 +2,11 @@ package gui;
 
 import java.net.URL;
 import java.sql.Date;
-import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
@@ -224,13 +221,7 @@ public class ReunioesCriancasFormController implements Initializable {
 		}
 
 		txtId.setText(String.valueOf(entity.getReu_id()));
-		 
-		/*if (entity.getReu_data() != null) {
-			dpDataReuniao.setValue(LocalDate.ofInstant(entity.getReu_data().toInstant(), ZoneId.systemDefault()));
-		}
-		*/
-		
-		
+				
 		if (entity.getReu_data() != null) {
 			dpDataReuniao.setValue(LocalDate.parse(entity.getReu_data().toString()));
 		}

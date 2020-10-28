@@ -1,6 +1,7 @@
 package model.entities;
 
 import java.io.Serializable;
+import java.util.Date;
 import java.util.Arrays;
 
 public class Pessoas implements Serializable{
@@ -10,6 +11,7 @@ public class Pessoas implements Serializable{
 	private Integer pes_id;
 	private String pes_nome;
 	private String pes_rg;
+	private Date pes_dataNascimento;
 	private String pes_pai;
 	private String pes_mae;
 	private String pes_endereco;
@@ -24,13 +26,14 @@ public class Pessoas implements Serializable{
 	
 	public Pessoas() {}
 
-	public Pessoas(Integer pes_id, String pes_nome, String pes_rg, String pes_pai, String pes_mae, String pes_endereco,
+	public Pessoas(Integer pes_id, String pes_nome, String pes_rg, Date pes_dataNascimento, String pes_pai, String pes_mae, String pes_endereco,
 			String pes_bairro, String pes_telefone, String pes_celular, String pes_observacoes, Cidades cidades,
 			Equipes equipes, Grupos grupos, TiposUsuarios tiposUsuarios) {
 		super();
 		this.pes_id = pes_id;
 		this.pes_nome = pes_nome;
 		this.pes_rg = pes_rg;
+		this.pes_dataNascimento = pes_dataNascimento;
 		this.pes_pai = pes_pai;
 		this.pes_mae = pes_mae;
 		this.pes_endereco = pes_endereco;
@@ -73,6 +76,14 @@ public class Pessoas implements Serializable{
 
 	public void setPes_rg(String pes_rg) {
 		this.pes_rg = pes_rg;
+	}
+	
+	public Date getPes_dataNascimento() {
+		return pes_dataNascimento;
+	}
+
+	public void setPes_dataNascimento(Date pes_dataNascimento) {
+		this.pes_dataNascimento = pes_dataNascimento;
 	}
 
 	public String getPes_pai() {

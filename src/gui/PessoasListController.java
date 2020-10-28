@@ -2,6 +2,7 @@ package gui;
 
 import java.io.IOException;
 import java.net.URL;
+import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
@@ -73,6 +74,9 @@ public class PessoasListController implements Initializable, DataChangeListener 
 
 	@FXML
 	private Label lblPessoaRg;
+
+	@FXML
+	private Label lblPessoaDataNascimento;
 
 	@FXML
 	private Label lblPessoaPai;
@@ -187,7 +191,7 @@ public class PessoasListController implements Initializable, DataChangeListener 
 
 	private void InitializeNodes() {
 
-		tableColumnPessoaTelefone.setCellValueFactory(new PropertyValueFactory<>("pes_telefone"));
+		tableColumnPessoaTelefone.setCellValueFactory(new PropertyValueFactory<>("pes_celular"));
 		tableColumnPessoaNome.setCellValueFactory(new PropertyValueFactory<>("pes_nome"));
 
 		// para a tabela acompanhar altura e largura da tela
@@ -220,11 +224,10 @@ public class PessoasListController implements Initializable, DataChangeListener 
 					new EquipesService(), new TiposUsuariosService());// injeção de dependencia PessoasServices para
 																		// carregamento
 
-			controller.loadAssociatedObjects(); // carrega estados do banco de dados e deixa no controller
-
 			controller.subscribeDataChangeListener(this);// se inscrevendo para observar listeners (onDataChanged)
 			controller.updateFormData();
-
+			
+			controller.loadAssociatedObjects(); // carrega estados do banco de dados e deixa no controller
 			// passos para abrir um formulario modal a partir de outro de referência
 			Stage dialogStage = new Stage();
 			dialogStage.setTitle("Entre com os dados da pessoa: ");
@@ -252,6 +255,7 @@ public class PessoasListController implements Initializable, DataChangeListener 
 			lblPessoaId.setText(String.valueOf(pessoa.getPes_id()));
 			lblPessoaNome.setText(pessoa.getPes_nome());
 			lblPessoaRg.setText(pessoa.getPes_rg());
+			lblPessoaDataNascimento.setText(new SimpleDateFormat("dd/MM/yyyy").format(pessoa.getPes_dataNascimento()));
 			lblPessoaPai.setText(pessoa.getPes_pai());
 			lblPessoaMae.setText(pessoa.getPes_mae());
 			lblPessoaEndereco.setText(pessoa.getPes_endereco());
@@ -267,6 +271,7 @@ public class PessoasListController implements Initializable, DataChangeListener 
 			lblPessoaId.setText("");
 			lblPessoaNome.setText("");
 			lblPessoaRg.setText("");
+			lblPessoaDataNascimento.setText("");
 			lblPessoaPai.setText("");
 			lblPessoaMae.setText("");
 			lblPessoaEndereco.setText("");

@@ -2,6 +2,10 @@ package gui;
 
 import java.awt.image.BufferedImage;
 import java.net.URL;
+import java.sql.Date;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -21,6 +25,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
@@ -65,6 +70,9 @@ public class PessoasFormController implements Initializable {
 
 	@FXML
 	private TextField txtRg;
+	
+	@FXML
+	private DatePicker dpDataNascimento;
 	
 	@FXML
 	private TextField txtPai;
@@ -138,7 +146,7 @@ public class PessoasFormController implements Initializable {
 		this.tiposUsuariosService = tiposUsuariosService;
 	}
 
-	// metodo para se inscrever na lista
+	// metodo para se inscrever na lista e atualizar tela dos dados
 	public void subscribeDataChangeListener(DataChangeListener listener) {
 		dataChangeListeners.add(listener);
 	}
@@ -158,6 +166,7 @@ public class PessoasFormController implements Initializable {
 			service.saveOrUpdate(entity);
 			notifyDataChangeListeners();
 			Utils.currentStage(event).close();
+			
 		} catch (ValidationException e) {
 			setErrorMessages(e.getErrors());
 		} catch (DbException e) {
@@ -192,6 +201,12 @@ public class PessoasFormController implements Initializable {
 
 		obj.setPes_nome(txtNome.getText());
 		obj.setPes_rg(txtRg.getText());
+		if (dpDataNascimento.getValue() == null) {
+			exception.addError("Data Nascimento", "Field não pode estar em branco(empty)");
+		} else {
+			Instant instant = Instant.from(dpDataNascimento.getValue().atStartOfDay(ZoneId.systemDefault()));
+			obj.setPes_dataNascimento(Date.from(instant));
+		}
 		obj.setPes_pai(txtPai.getText());
 		obj.setPes_mae(txtMae.getText());
 		obj.setPes_endereco(txtEndereco.getText());
@@ -230,12 +245,10 @@ public class PessoasFormController implements Initializable {
 		Constraints.setTextFieldInteger(txtId);
 		Constraints.setTextFieldMaxLength(txtNome, 255);
 		Constraints.setTextFieldMaxLength(txtRg, 20);
+		Utils.formatDatePicker(dpDataNascimento, "dd/MM/yyyy");	
 		Constraints.setTextFieldMaxLength(txtPai, 255);
 		Constraints.setTextFieldMaxLength(txtMae, 255);
-		Constraints.setTextFieldMaxLength(txtEndereco, 255);
-		Constraints.setTextFieldMaxLength(txtBairro, 255);
-		Constraints.setTextFieldMaxLength(txtTelefone, 20);
-		Constraints.setTextFieldMaxLength(txtCelular, 20);
+
 		
 		initializeComboBoxCidades();
 		initializeComboBoxGrupos();
@@ -307,6 +320,9 @@ public class PessoasFormController implements Initializable {
 		txtId.setText(String.valueOf(entity.getPes_id()));
 		txtNome.setText(entity.getPes_nome());
 		txtRg.setText(entity.getPes_rg());
+		if (entity.getPes_dataNascimento() != null) {
+			dpDataNascimento.setValue(LocalDate.parse(entity.getPes_dataNascimento().toString()));
+		}
 		txtPai.setText(entity.getPes_pai());
 		txtMae.setText(entity.getPes_mae());
 		txtEndereco.setText(entity.getPes_endereco());

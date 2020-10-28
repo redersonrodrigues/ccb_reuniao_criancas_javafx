@@ -77,6 +77,7 @@ public class PessoasDaoJDBC implements PessoasDao {
 		obj.setPes_id(rs.getInt("pes_id"));
 		obj.setPes_nome(rs.getString("pes_nome"));
 		obj.setPes_rg(rs.getString("pes_rg"));
+		obj.setPes_dataNascimento(rs.getDate("pes_dataNascimento"));
 		obj.setPes_pai(rs.getString("pes_pai"));
 		obj.setPes_mae(rs.getString("pes_mae"));
 		obj.setPes_endereco(rs.getString("pes_endereco"));
@@ -176,23 +177,24 @@ public class PessoasDaoJDBC implements PessoasDao {
 		try {
 			st = conn.prepareStatement(
 					"INSERT INTO pessoas "
-					+ " (pes_nome, pes_rg, pes_pai, pes_mae, pes_endereco, pes_bairro, pes_telefone, pes_celular, id_cidades, id_grupos, id_equipes, id_tipos_usuarios, pes_observacoes) "
-					+ " VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+					+ " (pes_nome, pes_rg, pes_dataNascimento, pes_pai, pes_mae, pes_endereco, pes_bairro, pes_telefone, pes_celular, id_cidades, id_grupos, id_equipes, id_tipos_usuarios, pes_observacoes) "
+					+ " VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
 					, Statement.RETURN_GENERATED_KEYS);	
 
 			st.setString(1, obj.getPes_nome());
 			st.setString(2, obj.getPes_rg());
-			st.setString(3, obj.getPes_pai());
-			st.setString(4, obj.getPes_mae());
-			st.setString(5, obj.getPes_endereco());
-			st.setString(6, obj.getPes_bairro());
-			st.setString(7, obj.getPes_telefone());
-			st.setString(8, obj.getPes_celular());
-			st.setInt(9, obj.getCidades().getCid_id());
-			st.setInt(10, obj.getGrupos().getGru_id());
-			st.setInt(11, obj.getEquipes().getEqu_id());
-			st.setInt(12, obj.getTiposUsuarios().getTuser_id());
-			st.setString(13, obj.getPes_observacoes());
+			st.setDate(3, new java.sql.Date(obj.getPes_dataNascimento().getTime()));
+			st.setString(4, obj.getPes_pai());
+			st.setString(5, obj.getPes_mae());
+			st.setString(6, obj.getPes_endereco());
+			st.setString(7, obj.getPes_bairro());
+			st.setString(8, obj.getPes_telefone());
+			st.setString(9, obj.getPes_celular());
+			st.setInt(10, obj.getCidades().getCid_id());
+			st.setInt(11, obj.getGrupos().getGru_id());
+			st.setInt(12, obj.getEquipes().getEqu_id());
+			st.setInt(13, obj.getTiposUsuarios().getTuser_id());
+			st.setString(14, obj.getPes_observacoes());
 			int rowsAffected = st.executeUpdate();
 			
 			if (rowsAffected > 0) {
@@ -217,23 +219,24 @@ public class PessoasDaoJDBC implements PessoasDao {
 		PreparedStatement st = null;
 		try {
 			st = conn.prepareStatement("UPDATE pessoas "
-					+ "SET pes_nome = ?, pes_rg = ?, pes_pai = ?, pes_mae = ?, pes_endereco = ?, pes_bairro = ?, pes_telefone = ?, pes_celular = ?, id_cidades = ?, id_grupos = ?, id_equipes = ?, id_tipos_usuarios = ?, pes_observacoes = ? "
+					+ "SET pes_nome = ?, pes_rg = ?, pes_dataNascimento = ?, pes_pai = ?, pes_mae = ?, pes_endereco = ?, pes_bairro = ?, pes_telefone = ?, pes_celular = ?, id_cidades = ?, id_grupos = ?, id_equipes = ?, id_tipos_usuarios = ?, pes_observacoes = ? "
 					+ "WHERE pes_id = ?");
 
 			st.setString(1, obj.getPes_nome());
 			st.setString(2, obj.getPes_rg());
-			st.setString(3, obj.getPes_pai());
-			st.setString(4, obj.getPes_mae());
-			st.setString(5, obj.getPes_endereco());
-			st.setString(6, obj.getPes_bairro());
-			st.setString(7, obj.getPes_telefone());
-			st.setString(8, obj.getPes_celular());
-			st.setInt(9, obj.getCidades().getCid_id());
-			st.setInt(10, obj.getGrupos().getGru_id());
-			st.setInt(11, obj.getEquipes().getEqu_id());
-			st.setInt(12, obj.getTiposUsuarios().getTuser_id());
-			st.setString(13, obj.getPes_observacoes());
-			st.setInt(14, obj.getPes_id());
+			st.setDate(3, new java.sql.Date(obj.getPes_dataNascimento().getTime()));
+			st.setString(4, obj.getPes_pai());
+			st.setString(5, obj.getPes_mae());
+			st.setString(6, obj.getPes_endereco());
+			st.setString(7, obj.getPes_bairro());
+			st.setString(8, obj.getPes_telefone());
+			st.setString(9, obj.getPes_celular());
+			st.setInt(10, obj.getCidades().getCid_id());
+			st.setInt(11, obj.getGrupos().getGru_id());
+			st.setInt(12, obj.getEquipes().getEqu_id());
+			st.setInt(13, obj.getTiposUsuarios().getTuser_id());
+			st.setString(14, obj.getPes_observacoes());
+			st.setInt(15, obj.getPes_id());
 
 			st.executeUpdate();
 		} catch (SQLException e) {

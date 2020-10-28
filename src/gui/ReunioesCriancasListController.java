@@ -205,11 +205,11 @@ public class ReunioesCriancasListController implements Initializable, DataChange
 			controller.setReunioesCriancas(obj);
 			controller.setServices(new ReunioesCriancasService(), new PessoasService());// injeção de dependencia ReunioesCriancasServices para carregamento
 
-			controller.loadAssociatedObjects(); // carrega Pessoas do banco de dados e deixa no controller
-
 			controller.subscribeDataChangeListener(this);// se inscrevendo para observar listeners (onDataChanged)
 			controller.updateFormData();
 
+			controller.loadAssociatedObjects(); // carrega Pessoas do banco de dados e deixa no controller
+			
 			// passos para abrir um formulario modal a partir de outro de referência
 			Stage dialogStage = new Stage();
 			dialogStage.setTitle("Entre com os dados da reuniao: ");
